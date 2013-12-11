@@ -1,3 +1,13 @@
 source "https://rubygems.org"
 
 gem "foreman"
+
+# -- web server framework -----------------------------------------------------
+
+gem "thin"
+
+gem "rack"
+gem "rack_csrf"
+
+gem "sinatra"
+gem "sinatra-contrib"
