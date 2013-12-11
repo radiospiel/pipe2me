@@ -2,103 +2,73 @@ require "wordize"
 require "ssh"
 
 class Subdomain < ActiveRecord::Base
-  SELF = self
-  PORTS = 10000...40000
-  PORTS_PER_SUBDOMAIN = 3
 
-  # -- name and port are readonly, once chosen, and are set automatically.
+  # -- configuration ----------------------------------------------------------
+  
+  PORTS=::PORTS
+  PORTS_PER_SUBDOMAIN=::PORTS_PER_SUBDOMAIN
+
+  # -- name and port are readonly, once chosen, and are set automatically -----
   
   attr_readonly :name, :port
   
-  validates_presence_of   :name
+  validates_presence_of   :name, :on => :create
   validates_uniqueness_of :name, :on => :create
 
-  validates_inclusion_of  :port, :in => PORTS
+  validates_inclusion_of  :port, :on => :create, :in => PORTS
   validates_uniqueness_of :port, :on => :create
 
+  # -- the target host --------------------------------------------------------
+  
+  # This is the tunnel target hostname. This entry is useful to define 
+  # different tunnel targets based on some criteria, e.g. the region.
+
+  # The scheme for the target host.
+  validates_inclusion_of  :scheme, :in => %w(http https tcp)
+
+  # -- set default values -----------------------------------------------------
+  
   before_validation :initialize_defaults
 
   def initialize_defaults
-    self.port = SELF.choose_port unless port?
-    self.name = SELF.choose_name unless name?
+    require_relative "subdomain/builder"
+    
+    self.port = Builder.choose_port unless port?
+    self.name = Builder.choose_name unless name?
+    self.token = Builder.choose_token unless token?
   end
 
-  # -- ssh keys are generated if missing. (TODO: when?)
-  #
-  # validates_presence_of :ssh_public_key, :ssh_private_key
-  # before_validation :ssh_keygen, :unless => :has_ssh_key?
-  # 
+  # -- SSH keys ---------------------------------------------------------------
+  
+  # generate and save ssh keys if missing. 
   def ssh_keygen!
     return if has_ssh_key?
 
-    self.ssh_public_key, self.ssh_private_key = SSH.keygen(fullname)
-    save!
+    ssh_public_key, ssh_private_key = SSH.keygen(fullname)
+    update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
   end
-  
+
+  # does this record has ssh keys?
   def has_ssh_key?
     ssh_public_key.present? && ssh_private_key.present?
   end
 
   # -- dynamic attributes -----------------------------------------------------
   
-  def fullname
-    "#{name}.pipe2.me"
-  end
+  # def fullname
+  #   "#{name}.pipe2.me"
+  # end
+  # 
+  # def url(options = {})
+  #   port = options.key?(:port) ? options[:port] : self.port
+  #   if port
+  #     "https://#{fullname}:#{port}"
+  #   else
+  #     "https://#{fullname}"
+  #   end
+  # end
   
-  def url(options = {})
-    port = options.key?(:port) ? options[:port] : self.port
-    if port
-      "https://#{fullname}:#{port}"
-    else
-      "https://#{fullname}"
-    end
-  end
-  
-  def ports
-    port .. (port + PORTS_PER_SUBDOMAIN - 1)
-  end
-    
-  # -- generate names and ports ----------------------------------------------
-  
-  def self.choose_name
-    3.times do
-      name = Wordize.wordize(rand(100000))
-      return name unless SELF.where(name: name).first
-    end
-
-    8.times do
-      name = Wordize.wordize(rand(100000))
-      return name unless SELF.where(name: name).first
-      name += "-#{rand(10)}"
-      return name unless SELF.where(name: name).first
-    end
-
-    raise "Cannot find name"
-  end
-  
-  def self.choose_port_sql
-    return @choose_port_sql if @choose_port_sql
-
-    conditions = PORTS_PER_SUBDOMAIN.times.map do |idx|
-      "port+#{idx} NOT IN (SELECT port FROM subdomains)"
-    end
-  
-    @choose_port_sql = <<-SQL
-      SELECT * FROM (
-        SELECT port+#{PORTS_PER_SUBDOMAIN} AS port FROM subdomains
-          UNION
-        SELECT #{PORTS.min} AS port
-      )
-      WHERE  #{conditions.join(" AND ")}
-      ORDER BY port
-      LIMIT 1
-    SQL
-  end
-  
-  def self.choose_port
-    recs = ActiveRecord::Base.connection.select_all(choose_port_sql)
-
-    port = (recs.first && recs.first["port"]) || PORTS.min
-    return port if PORTS.cover?(port)
-  end
+  # def ports
+  #   port .. (port + PORTS_PER_SUBDOMAIN - 1)
+  # end
 end
