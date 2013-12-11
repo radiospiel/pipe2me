@@ -32,6 +32,8 @@ class Controllers::Base < Sinatra::Base
   configure :development do
     # reload sources
     register Sinatra::Reloader
+    also_reload "#{ROOT}/app/models/**/*"
+    also_reload "#{ROOT}/lib/**/*"
 
     # reload translations
     if defined?(I18n)

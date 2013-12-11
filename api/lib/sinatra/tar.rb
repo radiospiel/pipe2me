@@ -37,10 +37,10 @@ end
 # The Sinatra::Shell helper formats a hash as a tar file.
 module Sinatra::Tar
   SELF=self
-  
+
   def self.add_tar_entries(tar, entries, options = {})
     prefix = options[:prefix]
-    
+
     entries.each do |key, value|
       key = key.to_s
       path = options[:prefix] ? File.join(options[:prefix].to_s, key) : key

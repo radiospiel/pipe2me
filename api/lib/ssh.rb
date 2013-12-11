@@ -1,8 +1,10 @@
+
 require "sys"
+require "ui"
 
 module SSH
   extend self
-  
+
   def keygen(name)
     UI.benchmark "[#{name}] create ssh identity" do
       Dir.mktmpdir do |dir|
@@ -16,11 +18,11 @@ module SSH
       end
     end
   end
-  
+
   private
 
   # AUTHORIZED_KEYS_OPTIONS disable a number of sshd options, that are
-  # usually enabled by default. For some reason we need a pty, at least 
+  # usually enabled by default. For some reason we need a pty, at least
   # on some systems (Debian).
   AUTHORIZED_KEYS_OPTIONS = %w(
     command="/bin/false"
@@ -29,16 +31,16 @@ module SSH
     no-user-rc
     no-X11-forwarding
   )
-  
+
   # returns a single line for the authorized_keys file. For details see
   # sshd(8), but a quick remark: a line looks like this:
   #
-  #  option,option,option.. pub_key_data name 
+  #  option,option,option.. pub_key_data name
   #
   # and the options declare which ports may be used for which public key.
   def authorized_keys_line(subdomain)
     return unless subdomain.ssh_public_key?
-    
+
     options = AUTHORIZED_KEYS_OPTIONS.grep(/^[^#]/)
     options += subdomain.ports.map { |port|  "permitopen=\":#{port}\"" }
 
@@ -46,7 +48,7 @@ module SSH
   end
 
   public
-  
+
   # create the data for the authorized_keys file.
   def authorized_keys(subdomains)
     subdomains.map do |subdomain|
@@ -55,13 +57,13 @@ module SSH
   end
 
   # create the data for the authorized_keys file.
-  
+
   def config(options)
     expect! options => {
       :pid_file => [String, nil],
       :sshd_dir => String
     }
-    
+
     options[:pid_file] ||= File.join(options[:sshd_dir], "sshd.pid")
 
     template = File.read(__FILE__).split(/__END__\n/).last
@@ -74,7 +76,7 @@ end
 
 __END__
 
-# This sshd_config file is derived from the following OpenBSD default config 
+# This sshd_config file is derived from the following OpenBSD default config
 # file, and is adapted for use with the kinko server
 #
 #	$OpenBSD: sshd_config,v 1.81 2009/10/08 14:03:41 markus Exp $
@@ -154,8 +156,8 @@ AuthorizedKeysFile	${{SSHD_DIR}}/authorized_keys
 #GSSAPIStrictAcceptorCheck yes
 #GSSAPIKeyExchange no
 
-# Set this to 'yes' to enable PAM authentication, account processing, 
-# and session processing. If this is enabled, PAM authentication will 
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
 # be allowed through the ChallengeResponseAuthentication and
 # PasswordAuthentication.  Depending on your PAM configuration,
 # PAM authentication via ChallengeResponseAuthentication may bypass

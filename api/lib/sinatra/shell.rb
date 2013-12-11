@@ -4,22 +4,22 @@ require "shellwords"
 # into a Shell. Handle with care
 module Sinatra::Shell
   SELF=self
-  
+
   def self.format(obj, prefix)
     collect_entries([], obj, prefix).join
   end
-  
+
   def self.collect_entries(ary, obj, prefix)
     case obj
-    when Array 
+    when Array
       prefix = "#{prefix}_" if prefix
-      obj.each_with_index do |entry, idx| 
+      obj.each_with_index do |entry, idx|
         collect_entries ary, entry, "#{prefix}#{idx}"
       end
       ary
     when Hash
       prefix = "#{prefix}_" if prefix
-      obj.each do |key, value| 
+      obj.each do |key, value|
         collect_entries ary, value, "#{prefix}#{key.upcase}"
       end
       ary

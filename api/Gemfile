@@ -4,7 +4,9 @@ gem "foreman"
 
 # -- web server framework -----------------------------------------------------
 
-gem "thin"
+group :production do
+  gem "thin"
+end
 
 gem "rack"
 gem "rack_csrf"
@@ -20,4 +22,8 @@ gem "rake"
 
 group :development do
   gem "wirble"
+end
+
+group :development do
+  gem "etest-unit"
 end

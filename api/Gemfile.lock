@@ -22,6 +22,8 @@ GEM
     builder (3.1.4)
     daemons (1.1.9)
     dotenv (0.9.0)
+    etest-unit (0.9.1)
+      test-unit
     eventmachine (1.0.3)
     foreman (0.63.0)
       dotenv (>= 0.7)
@@ -52,6 +54,7 @@ GEM
       sinatra (~> 1.4.0)
       tilt (~> 1.3)
     sqlite3 (1.3.8)
+    test-unit (2.5.5)
     thin (1.6.1)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
@@ -67,6 +70,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  etest-unit
   foreman
   rack
   rack_csrf
