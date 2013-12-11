@@ -1,0 +1,9 @@
+# The pipe2.me software package
+
+## pipe2.me servers
+
+The api server is started with
+
+    cd api
+    foreman start
+
