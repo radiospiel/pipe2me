@@ -54,21 +54,23 @@ class Subdomain < ActiveRecord::Base
   end
 
   # -- dynamic attributes -----------------------------------------------------
-  
-  # def fullname
-  #   "#{name}.pipe2.me"
-  # end
-  # 
-  # def url(options = {})
-  #   port = options.key?(:port) ? options[:port] : self.port
-  #   if port
-  #     "https://#{fullname}:#{port}"
-  #   else
-  #     "https://#{fullname}"
-  #   end
-  # end
-  
-  # def ports
-  #   port .. (port + PORTS_PER_SUBDOMAIN - 1)
-  # end
+
+  def fullname
+    "#{name}.pipe2.me"
+  end
+
+  def url(options = {})
+    port = options.key?(:port) ? options[:port] : self.port
+    port = nil if port == (scheme == "https" ? 443 : 80)
+
+    if port
+      "#{scheme}://#{fullname}:#{port}"
+    else
+      "#{scheme}://#{fullname}"
+    end
+  end
+
+  def ports
+    (port .. (port + PORTS_PER_SUBDOMAIN - 1)).to_a
+  end
 end
