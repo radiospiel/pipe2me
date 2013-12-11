@@ -1,8 +1,18 @@
-require "sinatra/streaming"
+require "sinatra/base"
+require "sinatra/reloader"
+require "sinatra/activerecord" rescue nil
+
+module Controllers
+end
 
 class Controllers::Base < Sinatra::Base
-  register Sinatra::Streaming
-
+  if defined?(Sinatra::ActiveRecordExtension)
+    register Sinatra::ActiveRecordExtension
+    set :database, DATABASE_URL
+  end
+  
+  # -- The sourcefile setting is used to load views relative to the 
+  #    controller's sourcefile(s).
   set :sourcefile, nil
   
   # return the path for the views. As views should be stored next

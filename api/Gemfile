@@ -11,3 +11,10 @@ gem "rack_csrf"
 
 gem "sinatra"
 gem "sinatra-contrib"
+
+# -- models -------------------------------------------------------------------
+
+gem "sinatra-activerecord"
+gem "sqlite3"
+gem "rake"
+
