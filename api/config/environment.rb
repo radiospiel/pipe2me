@@ -7,7 +7,7 @@ $: << "#{ROOT}/lib"
 RACK_ENV = ENV["RACK_ENV"] || "development"
 DATABASE_URL="sqlite3:///#{ROOT}/var/#{RACK_ENV}.sqlite3"
 
-require "models"
+require "models/subdomain"
 
 # we must load the controllers/base file to make sure that the database
 # is actually connected. Yes, that sounds weird, but this is how 
