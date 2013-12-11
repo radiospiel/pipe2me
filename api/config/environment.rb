@@ -1,8 +1,16 @@
 # -- configure subdomains -----------------------------------------------------
 
-PORTS = 10000...40000
-PORTS_PER_SUBDOMAIN = 1
+VERSION = "0.1.0"
 
+# Manage subdomains of these domains:
+DOMAIN = %w(pipe2.dev)
+
+# Manage these ports:
+PORTS = 10000...40000
+
+# How many ports per subdomain? Each subdomain gets the same number of ports.
+# NOTE: THIS VALUE CANNOT BE CHANGED!
+PORTS_PER_SUBDOMAIN = 1
 
 ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
 STDERR.puts "Starting app in #{ROOT}"

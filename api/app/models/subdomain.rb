@@ -2,11 +2,30 @@ require "wordize"
 require "ssh"
 
 class Subdomain < ActiveRecord::Base
-
-  # -- configuration ----------------------------------------------------------
-
-  PORTS=::PORTS
-  PORTS_PER_SUBDOMAIN=::PORTS_PER_SUBDOMAIN
+  # A subdomain has these attributes:
+  #
+  # An auth token for this subdomain
+  # t.string  :token
+  #
+  # The full name of the subdomain, e.g. "pink-pony.pipe2.me".
+  # t.string  :name
+  #
+  # The hostname of the subdomain's endpoint. A typical endpoint might be
+  # "eu.pipe2.me". The endpoint will be used as the CNAME for DNS based
+  # redirection to the tunnel, if the start point is not publicly accessible.
+  #
+  # t.string :endpoint
+  #
+  # The scheme of the subdomain at port :port. This can be http
+  # or https, and is used to verify whether a client is accessible.
+  # t.string  :scheme, default: "http"
+  #
+  # The first port number of the subdomain
+  # t.integer :port
+  #
+  # The private and public SSH key
+  # t.text    :ssh_public_key
+  # t.text    :ssh_private_key
 
   # -- name and port are readonly, once chosen, and are set automatically -----
 
@@ -44,7 +63,7 @@ class Subdomain < ActiveRecord::Base
   def ssh_keygen!
     return if has_ssh_key?
 
-    ssh_public_key, ssh_private_key = SSH.keygen(fullname)
+    ssh_public_key, ssh_private_key = SSH.keygen(name)
     update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
   end
 
@@ -55,19 +74,9 @@ class Subdomain < ActiveRecord::Base
 
   # -- dynamic attributes -----------------------------------------------------
 
-  def fullname
-    "#{name}.pipe2.me"
-  end
-
   def url(options = {})
-    port = options.key?(:port) ? options[:port] : self.port
-    port = nil if port == (scheme == "https" ? 443 : 80)
-
-    if port
-      "#{scheme}://#{fullname}:#{port}"
-    else
-      "#{scheme}://#{fullname}"
-    end
+    port = options[:port] || self.port
+    "#{scheme}://#{name}:#{port}"
   end
 
   def ports
