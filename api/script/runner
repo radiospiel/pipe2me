@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+curdir = Dir.pwd
+ 
+require_relative "../config/environment"
+
+Dir.chdir curdir
+
+load ARGV.shift
