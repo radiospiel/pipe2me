@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 1) do
     t.string   "token"
     t.string   "host"
     t.string   "name"
+    t.string   "scheme",          default: "http"
     t.integer  "port"
     t.text     "ssh_public_key"
     t.text     "ssh_private_key"

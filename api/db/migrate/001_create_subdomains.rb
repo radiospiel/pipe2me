@@ -10,6 +10,9 @@ class CreateSubdomains < ActiveRecord::Migration
       # the name of the subdomain 
       t.string  :name
 
+      # the scheme of the subdomain. This can be http or https
+      t.string  :scheme, default: "http"
+
       # the first port number of the subdomain 
       t.integer :port
       

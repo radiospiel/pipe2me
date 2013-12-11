@@ -13,6 +13,10 @@
 #   reader.close
 # end
 
+# -- load app environment -----------------------------------------------------
+
+require "#{File.dirname(__FILE__)}/config/environment"
+
 # -- redirect stdout via timestamp tool ---------------------------------------
 
 require "rack"
@@ -27,6 +31,13 @@ use Rack::Static, :urls => ["/assets"], :root => 'public'
 unless Sinatra::Base.development?
   use Rack::CommonLogger 
 end
+
+# -- redirect on subdomain name -----------------------------------------------
+
+require "models/subdomain/redirection"
+use Subdomain::Redirection
+
+# -- more rack stuff ----------------------------------------------------------
 
 use Rack::ETag
 use Rack::ContentLength
@@ -55,10 +66,6 @@ require "rack/csrf"
 
 # simulate HTTP verbs for restful forms
 # use Rack::MethodOverride
-
-# -- load app environment -----------------------------------------------------
-
-require "#{File.dirname(__FILE__)}/config/environment"
 
 # -- load controllers ---------------------------------------------------------
 
