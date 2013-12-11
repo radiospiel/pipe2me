@@ -3,18 +3,21 @@ require "sinatra/reloader"
 require "sinatra/activerecord" rescue nil
 
 module Controllers
+  class Base < Sinatra::Base
+  end
 end
+
 
 class Controllers::Base < Sinatra::Base
   if defined?(Sinatra::ActiveRecordExtension)
     register Sinatra::ActiveRecordExtension
     set :database, DATABASE_URL
   end
-  
-  # -- The sourcefile setting is used to load views relative to the 
+
+  # -- The sourcefile setting is used to load views relative to the
   #    controller's sourcefile(s).
   set :sourcefile, nil
-  
+
   # return the path for the views. As views should be stored next
   # to the controller we try to find the controller's main source.
   set :views do
@@ -23,7 +26,7 @@ class Controllers::Base < Sinatra::Base
     end
     File.dirname self.sourcefile
   end
-  
+
   # -- development configuration ----------------------------------------------
 
   configure :development do
@@ -41,3 +44,5 @@ class Controllers::Base < Sinatra::Base
   # -- layout setting ---------------------------------------------------------
   set :layout, "application"
 end
+
+require_relative "./auto_renderer"

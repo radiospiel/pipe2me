@@ -27,17 +27,20 @@ module Sinatra::Tar
       key = key.to_s
       path = options[:prefix] ? File.join(options[:prefix].to_s, key) : key
 
-      if value.is_a?(Hash)
+      case value
+      when Hash
         add_tar_entries tar, value, :prefix => path
+      when nil
       else
-        tar.add_entry path, value, mode: 0644, mtime: Time.now
+        tar.add_entry path, value.to_s, mode: 0644, mtime: Time.now
       end
     end
   end
-  
+
   def tar(entries)
-    headers["Content-Type"] = "application/tar"
-    
+    raise ArgumentError, "Invalid entries: #{entries.inspect}" unless entries.is_a?(Hash)
+    headers["Content-Type"] = "application/x-tar"
+
     s = ""
     Gem::Package::TarWriter.new(StringIO.new(s)) do |tar|
       SELF.add_tar_entries tar, entries, prefix: nil

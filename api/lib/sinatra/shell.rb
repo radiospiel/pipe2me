@@ -35,9 +35,9 @@ module Sinatra::Shell
   end
 
   def shell(obj, prefix=nil)
-    response.headers["Content-Type"] = "application/shell;charset=utf-8"
-
-    prefix = self.class.name.gsub(/.*::/, "").upcase
     SELF.format(obj, prefix)
   end
 end
+
+Rack::Mime::MIME_TYPES[".shell"] ||= "application/x-shell"
+Rack::Mime::MIME_TYPES[".sh"] ||= "application/x-sh"
