@@ -21,7 +21,8 @@ class Controllers::Base
     "application/x-tar"   => :tar,
     "application/x-shell" => :shell,
     "application/x-sh"    => :shell,
-    "application/json"    => :json
+    "application/json"    => :json,
+    "application/javascript" => :json
   }
 
   attr :default_renderer, true
