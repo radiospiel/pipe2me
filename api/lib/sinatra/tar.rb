@@ -2,15 +2,33 @@ require "rubygems/package"
 
 Gem::Package::TarWriter
 class Gem::Package::TarWriter
-  def add_entry(name, data, options = {}) #:nodoc:
+  # each entry in the tar file, headers as well as data entries, start at
+  # 512-byte boundaries. The :fill_block method can be used to fill up
+  # the current 512-byte block.
+  def fill_block
+    fill_bytes = (512 - (@io.pos % 512)) % 512
+    UI.success "fill_bytes", fill_bytes
+    @io.write "\0" * fill_bytes if fill_bytes > 0
+  end
+
+  private :fill_block
+
+  def add_entry(name, data, options = {})
     check_closed
 
-    name, prefix = split_name name
+    name, prefix = split_name(name)
 
-    tar_options = options.merge(:name => name, :size => data.bytesize, :prefix => prefix)
-    header = Gem::Package::TarHeader.new(tar_options)
+    options = options.reverse_merge(name: name,
+                prefix: prefix,
+                size: data.bytesize,
+                mtime: Time.now)
+
+    header = Gem::Package::TarHeader.new(options)
     @io.write header
+    fill_block
+
     @io.write data
+    fill_block
 
     self
   end
