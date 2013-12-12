@@ -45,6 +45,42 @@ class Controllers::Base < Sinatra::Base
 
   # -- layout setting ---------------------------------------------------------
   set :layout, "application"
+
+  # see also http://hawkins.io/2013/06/error-handling-in-sinatra-apis/
+
+  # -- error handling ---------------------------------------------------------
+
+  set :dump_errors, true
+  set :show_exceptions, false
+
+  helpers do
+    def render_error(code, msg=nil)
+      e = env['sinatra.error']
+      msg ||= unless self.class.development?
+        "#{e.message}"
+      else
+        "#{e.class.name}: #{e.message}"
+      end
+
+      if self.class.development?
+        msg.concat "\n\nfrom #{e.backtrace.join("\n     ")}"
+        msg = "== ERROR #{code} ================================\n\n#{msg}"
+      end
+
+      content_type :text
+      status code
+
+      msg
+    end
+  end
+
+  error do
+    render_error 500
+  end
+
+  error ActiveRecord::RecordNotFound do
+    render_error 404
+  end
 end
 
 require_relative "./auto_renderer"

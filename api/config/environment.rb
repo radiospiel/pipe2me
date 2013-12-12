@@ -21,6 +21,13 @@ $: << "#{ROOT}/lib"
 RACK_ENV = ENV["RACK_ENV"] || "development"
 DATABASE_URL="sqlite3:///#{ROOT}/var/#{RACK_ENV}.sqlite3"
 
+# -- load initializers --------------------------------------------------------
+
+Dir.glob("#{ROOT}/config/initializers/*.rb").sort.each do |file|
+  load file
+end
+
+# -- load models --------------------------------------------------------------
 
 require "active_record"
 require "models/subdomain"
