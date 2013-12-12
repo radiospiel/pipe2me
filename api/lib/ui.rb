@@ -1,16 +1,16 @@
 module UI
   extend self
-  
+
   VERSION = "0.2.0 custom"
-  
+
   def self.verbosity
     @verbosity ||= 1
   end
-  
+
   def self.verbosity=(verbosity)
     @verbosity = verbosity
   end
-  
+
   COLORS = {
     clear:      "\e[0m",  # Embed in a String to clear all previous ANSI sequences.
     bold:       "\e[1m",  # The start of an ANSI bold sequence.
@@ -34,14 +34,14 @@ module UI
   }
 
   @@started_at = Time.now
-  
+
   MESSAGE_COLOR = {
     :info     => :cyan,
     :warn     => :yellow,
     :error    => :red,
     :success  => :green,
   }
-  
+
   MIN_VERBOSITY = {
     :debug    => 3,
     :info     => 2,
@@ -75,28 +75,31 @@ module UI
     if msg.is_a?(Symbol)
       severity, msg = msg, args.shift
     end
-    
+
     start = Time.now
-    yield.tap do
-      msg += ": #{(1000 * (Time.now - start)).to_i} msecs."
-      UI.log severity, msg, *args
-    end
+    r = yield
+
+    msg += ": #{(1000 * (Time.now - start)).to_i} msecs."
+    UI.log severity, msg, *args
+
+    r
   end
 
   def self.colored=(colored)
     @colored = colored
   end
-  
+
   def self.colored?
     @colored != false
   end
-  
+
   private
+
 
   def self.log(sym, msg, *args)
     rv = args.empty? ? msg : args.first
-    
-    return rv unless verbosity >= MIN_VERBOSITY[sym] 
+
+    return rv unless verbosity >= MIN_VERBOSITY[sym]
 
     unless args.empty?
       msg += ": " + args.map(&:inspect).join(", ")
@@ -105,9 +108,14 @@ module UI
     if color = colored? && COLORS[MESSAGE_COLOR[sym]]
       msg = "#{color}#{msg}#{COLORS[:clear]}"
     end
-    
+
+    source = caller[1]
+    source.gsub!( Dir.getwd, "." )
+    source.gsub!( File.expand_path("~"), "~" )
+    msg = "%-90s from: %s" % [ msg, source ]
+
     STDERR.puts msg
-    
+
     rv
   end
 end

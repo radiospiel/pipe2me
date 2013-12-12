@@ -7,7 +7,6 @@ class Gem::Package::TarWriter
   # the current 512-byte block.
   def fill_block
     fill_bytes = (512 - (@io.pos % 512)) % 512
-    UI.success "fill_bytes", fill_bytes
     @io.write "\0" * fill_bytes if fill_bytes > 0
   end
 
