@@ -1,6 +1,4 @@
-require "http"
 require "json"
-require "tar"
 
 UI.verbosity = 2
 

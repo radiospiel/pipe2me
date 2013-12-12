@@ -1,6 +1,4 @@
-#!/usr/bin/env ruby
-$:.unshift "."
-require "trollop"
+require "vendor/trollop"
 
 module Pipe2me::CLI
   extend self
@@ -64,7 +62,6 @@ end
 
 options = global_opts.update(cmd_opts)
 Pipe2me.server = options[:server]
-UI.warn "Server", Pipe2me.server
 
 begin
   Pipe2me::CLI.send cmd, *ARGV, options

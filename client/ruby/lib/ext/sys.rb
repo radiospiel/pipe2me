@@ -1,18 +1,16 @@
 require "shellwords"
 
 module Sys
-  class ExitError < RuntimeError; end
+  extend self
 
-  def self.log(*args)
-    # STDERR.puts args.map(&:shellescape) * " "
-  end
+  class ExitError < RuntimeError; end
 
   def sys!(*args, &block)
     options = args.last.is_a?(Hash) ? args.pop : {}
     stdin = options[:stdin]
 
     r = nil
-    Sys.log *args
+    UI.info *args
 
     IO.popen([*args.map(&:to_s)], 'w+') do |io|
       io.set_encoding("BINARY")
@@ -31,17 +29,17 @@ module Sys
     r
   end
 
-  def sys(*args, &block)
-    sys!(*args, &block) || ""
-  rescue ExitError
-    nil
-  end
-
   def bash!(cmd, &block)
     sys! "bash", "-c", cmd, &block
   end
 
-  def bash(cmd, &block)
-    sys "bash", "-c", cmd, &block
+  private
+
+  def method_missing(sym, *args, &block)
+    super unless respond_to?("#{sym}!")
+
+    self.send("#{sym}!", *args, &block) || ""
+  rescue ExitError
+    nil
   end
 end

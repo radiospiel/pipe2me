@@ -1,5 +1,4 @@
-require "sys"
-Sys.extend Sys
+require "ext/sys"
 
 module Installer
   extend self

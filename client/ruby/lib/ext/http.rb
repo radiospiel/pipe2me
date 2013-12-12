@@ -1,8 +1,6 @@
 require "net/http"
 require "ostruct"
 
-require "ui"
-
 # The HTTP module implements a simple wrapper around Net::HTTP, intended to
 # ease the pain of dealing with HTTP requests. It uses the `addressable` gem
 # to support IDN (internationized) domain names. If the "idn" gem is installed
@@ -129,6 +127,8 @@ module HTTP
     do_request Net::HTTP::Post, url, headers, body
   end
 
+  private
+
   def method_missing(sym, *args, &block)
     case sym.to_s
     when /^(.*)\!$/
@@ -141,8 +141,6 @@ module HTTP
       super
     end
   end
-
-  private
 
   #:nodoc:
   def do_request(verb, uri, headers, body = nil)

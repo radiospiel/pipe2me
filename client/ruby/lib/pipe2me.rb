@@ -1,3 +1,8 @@
+require_relative "ext/http"
+require_relative "ext/sys"
+require_relative "ext/tar"
+require_relative "ext/ui"
+
 module Pipe2me
   extend self
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
-$:.unshift "."
-$:.unshift "./lib"
+$:.unshift "#{File.dirname(__FILE__)}/../lib"
 
-require "trollop"
 require "pipe2me"
 require "pipe2me/cli"
