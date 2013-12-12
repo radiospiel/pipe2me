@@ -27,6 +27,7 @@ where <subcommand> can be one of
 
   install ... install pipe2me dependencies and OS scripts
   setup   ... setup pipe2me tunnel
+  start   ... start pipe2me tunnels
   enable  ... enable all pipe2me tunnels
   disable ... disable all pipe2me tunnels
   status  ... print pipe2me tunnel status
