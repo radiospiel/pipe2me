@@ -57,7 +57,7 @@ class Controllers::Subdomains < Controllers::Base
 
       attrs = {
         "info.inc"      => shell(attrs),
-        subdomain.fullname => {
+        subdomain.name => {
           "info.inc"    => shell(attrs),
           "id_rsa"      => subdomain.ssh_private_key,
           "id_rsa.pub"  => subdomain.ssh_public_key

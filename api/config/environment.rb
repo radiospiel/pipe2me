@@ -3,7 +3,7 @@
 VERSION = "0.1.0"
 
 # Manage subdomains of these domains:
-DOMAIN = %w(pipe2.dev)
+DOMAIN = "pipe2.dev"
 
 # Manage these ports:
 PORTS = 10000...40000
