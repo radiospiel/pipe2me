@@ -37,7 +37,7 @@ class Controllers::Subdomains < Controllers::Base
 
   # return the token configuration
   get "/:token" do
-    subdomain = Subdomain.where(token: params[:token]).first
+    subdomain = Subdomain.find_by_token(params[:token])
     render subdomain: render_attributes(subdomain)
   end
 

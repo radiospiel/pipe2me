@@ -82,4 +82,9 @@ class Subdomain < ActiveRecord::Base
   def ports
     (port .. (port + PORTS_PER_SUBDOMAIN - 1)).to_a
   end
+
+  def self.find_by_token(token)
+    where(token: token).first ||
+      raise(ActiveRecord::RecordNotFound, "Couldn't find Subdomain with token #{token.inspect}")
+  end
 end
