@@ -1,0 +1,89 @@
+Pipe2me stories
+
+### a client can authorize itself via an authorization token
+
+### an authorized client can bind a subdomain to its account 
+
+- The server responds with an account suggestion
+
+### an authorized client can bind a subdomain to its account 
+
+- The number of subdomains per account is limited.
+
+# pipe2me command line
+
+## install the pipe2me software
+
+    # install pipe2me software
+    sudo gem install pipe2me
+
+This installs the pipe2me software on Linux and OSX. 
+It also makes sure that all dependencies (most notably ssh, autossh) are available, 
+and that the system is supported. (We support Debian, probably some other Linuxes, and OSX.)
+
+Installs the pipe2me init script on Linux. Installs a LaunchAgent on OSX.
+
+## pipe2me setup
+
+    # setup pipe2me software; the authtoken must be read from https://pipe2.me/account
+    sudo pipe2me setup auth=<authtoken> port=33411
+
+- fetches a domain name from https://api.pipe2.me 
+- receives SSL certificates for this instance
+- creates a certificate for the received domain name
+- creates a CSR for the certificate
+- sends the CSR to https://api.pipe2.me 
+- receives the certificate
+- stores everything in /etc/pipe2me
+
+## Control the pipe2me service
+
+    # check pipe2me status
+    sudo pipe2me status
+    
+- returns the local pipe2me status (enabled, shows local ports and connections)
+
+    # activate the pipe2me service
+    sudo pipe2me enable
+
+- Makes sure pipe2me is setup
+- starts autossh for each configured connection.
+
+    # deactivate the pipe2me service
+    sudo pipe2me disable
+
+- stops all pipe2me autossh connections.
+
+# setup online access for your mailpile installation, via command line
+
+1. Select "pipe2me" plugin page
+
+        pipe2.me
+        [ ] Enable online access
+        Online access is provided by [pipe2.me](https://pipe2.me)
+    
+1. Signup
+
+        [X] Enable online access
+
+        Get your [pipe2.me] auth token: ___________________
+        Enter pipe2.me auth token: ___________________
+    
+        [ Activate online access ]
+
+        Online access is provided by [pipe2.me](https://pipe2.me)
+    
+1. When signed up
+
+        [X] Enable online access
+        Your pipe2.me auth token: NNNNNNNNNNNNNNN
+        [ Deactivate online access ] [ Manage your pipe2.me account ]
+        Online access is provided by [pipe2.me](https://pipe2.me)
+    
+1. When signed up and disabled
+
+        [ ] Enable online access
+        [ Activate online access ] [ Manage your pipe2.me account ]
+        Online access is provided by [pipe2.me](https://pipe2.me)
+
+    
