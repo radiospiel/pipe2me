@@ -113,6 +113,21 @@ module HTTP
         end
       end
     end
+
+    def content_type
+      headers["content-type"]
+    end
+
+    def parse
+      case content_type
+      when /application\/json/
+        require "json" unless defined?(JSON)
+        JSON.parse(self)
+      else
+        UI.warn "#{url}: Cannot parse #{content_type.inspect} response"
+        self
+      end
+    end
   end
 
   # -- do requests ----------------------------------------------------

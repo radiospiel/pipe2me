@@ -1,5 +1,3 @@
-require "json"
-
 UI.verbosity = 2
 
 module Pipe2me::CLI
@@ -19,7 +17,7 @@ module Pipe2me::CLI
   # - stores everything in /etc/pipe2me
   def setup(options = {})
     response = HTTP.get! "#{Pipe2me.server}/subdomains"
-    subdomains = JSON.parse(response)["subdomains"]
+    subdomains = response.parse["subdomains"]
     UI.success "#{Pipe2me.server} has #{subdomains.count} subdomains"
 
     if Dir.exist?(".pipe2me")
@@ -38,7 +36,7 @@ module Pipe2me::CLI
     else
       # create a pipe2me setup
       response = HTTP.post! "#{Pipe2me.server}/subdomains", ""
-      subdomain = JSON.parse(response)["subdomain"]
+      subdomain = response.parse["subdomain"]
       token, url = subdomain.values_at "token", "url"
       UI.success "created tunnel", url
     end
