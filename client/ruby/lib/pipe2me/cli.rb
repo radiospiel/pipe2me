@@ -1,5 +1,7 @@
 require "vendor/trollop"
 
+UI.verbosity = 2
+
 module Pipe2me::CLI
   extend self
 
@@ -19,7 +21,7 @@ end
 
 global_opts = Trollop::options do
   banner <<-BANNER
-pipe2.me command line client.
+pipe2.me command line client, #{Pipe2me::VERSION}.
 
   pipe2me [ <options> ] <subcommand> [ <options> ]
 

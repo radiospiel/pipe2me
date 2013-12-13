@@ -1,50 +1,53 @@
-UI.verbosity = 2
+require "forwardable"
 
 module Pipe2me::CLI
-  # sets up a pipe2.me tunnel. Options include:
-  #
-  # - auth: the authtoken, as read from https://pipe2.me/account
-  # - port: the port number
-  #
-  # This method does the following:
-  #
-  # - fetches a domain name from https://api.pipe2.me
-  # - receives SSL certificates for this instance
-  # - creates a certificate for the received domain name
-  # - creates a CSR for the certificate
-  # - sends the CSR to https://api.pipe2.me
-  # - receives the certificate
-  # - stores everything in /etc/pipe2me
-  def setup(options = {})
-    response = HTTP.get! "#{Pipe2me.server}/subdomains"
-    subdomains = response.parse["subdomains"]
-    UI.success "#{Pipe2me.server} has #{subdomains.count} subdomains"
+  extend Forwardable
+  delegate :tunnels => Pipe2me::Config
 
-    if Dir.exist?(".pipe2me")
-      info_inc = File.read ".pipe2me/subdomain/info.inc"
-
-      if info_inc =~ /TOKEN=(.*)/
-        token = $1
-      end
-      if info_inc =~ /URL=(.*)/
-        url = $1
-      end
-
-      raise "Invalid config file .pipe2me/subdomain/info.inc" unless token && url
-      UI.success "configured tunnel", url
-      # if we have a pipe2me setup in this directory, we use that.
-    else
-      # create a pipe2me setup
-      response = HTTP.post! "#{Pipe2me.server}/subdomains", ""
-      subdomain = response.parse["subdomain"]
-      token, url = subdomain.values_at "token", "url"
-      UI.success "created tunnel", url
+  def list(options = {})
+    tunnels.each do |name, tunnel|
+      puts name
     end
+  end
+
+  # update all tunnels
+  def update(options = {})
+    tunnels.each do |name, tunnel|
+      UI.warn name, tunnel
+    end
+  end
+
+  # fetch a new pipe2me setup
+  #
+  # pipe2me setup --server https://pipe2.me:4488 --auth authtoken [ --local 127.0.0.1:123 ]
+  def setup(options = {})
+    UI.warn "Connecting to #{Pipe2me.server}"
+
+    response = HTTP.post! "#{Pipe2me.server}/subdomains", ""
+    subdomain = response.parse["subdomain"]
+    token, url = subdomain.values_at "token", "url"
+    UI.success "created tunnel", url
 
     response = HTTP.get! "#{Pipe2me.server}/subdomains/#{token}.tar"
-    UI.debug "Got provisioning: #{response.bytesize} bytes"
+    info = install_response(response)
 
-    Tar.extract StringIO.new(response), target: ".pipe2me"
+    UI.debug "#{info[:url]}: Received provisioning #{response.bytesize} bytes"
+    puts info[:url]
+  end
+
+  private
+
+  # unpacks the tunnel response from the server, returns the tunnel information.
+  def install_response(response)
+    Dir.mktmpdir("pipe2me") do |dir|
+      Tar.extract StringIO.new(response), target: dir
+
+      Dir.glob("#{dir}/subdomain/*").each do |path|
+        next unless File.directory?(path)
+        FileUtils.mv path, Pipe2me::Config.dir(:tunnels)
+      end
+
+      Pipe2me::Config.parse_info "#{dir}/subdomain/info.inc"
+    end
   end
 end
-
