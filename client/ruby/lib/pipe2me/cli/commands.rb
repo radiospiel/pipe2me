@@ -63,4 +63,9 @@ module Pipe2me::CLI
     # install launchagent/init script
     # Installer.install "ssh", "autossh"
   end
+
+  banner "Export init.d scripts"
+  def export(fmt="initscript")
+    Pipe2me::Tunnel.export "initscript"
+  end
 end

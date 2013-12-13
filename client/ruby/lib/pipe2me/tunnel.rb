@@ -9,6 +9,19 @@ module Pipe2me::Tunnel
     Kernel.exec "foreman", "start", "--procfile=#{Procfile.path}", "--root=#{File.expand_path("~")}"
   end
 
+  def export(format)
+    path = File.join(Pipe2me::Config.path, format)
+
+    Procfile.write      # rebuild procfile
+
+    Kernel.exec "foreman", "export", format,
+      path,                                                     # the resulting config file(s)
+      "--procfile=#{Procfile.path}",                            # the input procfile
+      # "--root=#{Pipe2me::Config.path("foreman.root")}",       # the "app" root
+      # "--app=#{Pipe2me::Config.path("foreman.app")}",         # the "app" root
+      "--log=#{Pipe2me::Config.path("foreman.log")}"          # the log dir
+  end
+
   private
 
   module Procfile
