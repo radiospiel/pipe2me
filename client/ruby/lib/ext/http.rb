@@ -6,8 +6,12 @@ require "ostruct"
 # to support IDN (internationized) domain names. If the "idn" gem is installed
 # it will use that for faster, native IDN support.
 module HTTP
-  require "addressable/uri"
-  URI = Addressable::URI
+  begin
+    require "addressable/uri"
+    URI = Addressable::URI
+  rescue LoadError
+    URI = ::URI
+  end
 
   extend self
 

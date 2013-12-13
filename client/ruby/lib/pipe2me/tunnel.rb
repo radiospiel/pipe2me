@@ -5,7 +5,7 @@ module Pipe2me::Tunnel
   def start_all
     Procfile.write      # rebuild procfile
 
-    UI.info File.read(Procfile.path)
+    puts File.read(Procfile.path)
     Kernel.exec "foreman", "start", "--procfile=#{Procfile.path}", "--root=#{File.expand_path("~")}"
   end
 
@@ -27,13 +27,10 @@ module Pipe2me::Tunnel
           end
         end
       end
-
-      UI.warn File.read(path)
     end
 
     def entries_for(name)
       info = Pipe2me::Config.tunnel(name)
-      UI.warn name, info
 
       name, ports, tunnel = info.values_at :name, :ports, :tunnel
       tunnel_uri = URI.parse(tunnel)
