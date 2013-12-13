@@ -1,4 +1,11 @@
 module Pipe2me::CLI
+  banner "delete one or more tunnel"
+  def rm(arg)
+    Pipe2me::Config.tunnels(arg).each do |name|
+      Pipe2me::Config.uninstall_tunnel name
+    end
+  end
+
   banner "short list all tunnels"
   def ls(*args)
     Pipe2me::Config.tunnels(*args).each do |name|

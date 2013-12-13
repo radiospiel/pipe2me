@@ -38,9 +38,14 @@ module Pipe2me::Config
   # -- Tunnel information -----------------------------------------------------
 
   # returns an array with the names of all tunnels.
-  def tunnels
-    Dir.glob("#{path("tunnels")}/*").sort.map do |dirname|
+  def tunnels(*patterns)
+    tunnels = Dir.glob("#{path("tunnels")}/*").sort.map do |dirname|
       File.basename(dirname)
+    end
+    return tunnels if patterns.empty?
+
+    tunnels.select do |tunnel|
+      patterns.any? do |pattern| File.fnmatch(pattern, tunnel) end
     end
   end
 
@@ -91,5 +96,10 @@ module Pipe2me::Config
     File.open "#{path}/local.inc", "w" do |io|
       io.puts "SERVER=#{self.server}"
     end
+  end
+
+  def uninstall_tunnel(name)
+    path = self.path("tunnels/#{name}")
+    FileUtils.rm_rf path
   end
 end
