@@ -1,8 +1,3 @@
-require_relative "ext/http"
-require_relative "ext/sys"
-require_relative "ext/tar"
-require_relative "ext/ui"
-
 module Pipe2me
   extend self
 
@@ -17,3 +12,11 @@ module Pipe2me
     @server || config["server"]
   end
 end
+
+require_relative "pipe2me/version"
+require_relative "pipe2me/config"
+
+require_relative "ext/http"
+require_relative "ext/sys"
+require_relative "ext/tar"
+require_relative "ext/ui"
