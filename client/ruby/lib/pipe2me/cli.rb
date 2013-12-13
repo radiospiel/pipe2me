@@ -64,13 +64,14 @@ pipe2me setup [ options ]
 end
 
 options = global_opts.update(cmd_opts)
-Pipe2me.server = options[:server]
+
+Pipe2me::Config.server = options[:server] if options.key?(:server)
 
 begin
   Pipe2me::CLI.send cmd, *ARGV, options
-rescue RuntimeError, SystemCallError
-  UI.error $!.message
-  exit 1
+# rescue RuntimeError, SystemCallError
+#   UI.error $!.message
+#   exit 1
 # rescue StandardError
 #   STDERR.puts $!.message
 #   exit 99
