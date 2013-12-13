@@ -40,7 +40,7 @@ module Pipe2me::Tunnel
 
       # verify, and, if needed, fix id_rsa mod (too prevent (some) ssh's
       # from complaining
-      id_rsa = "#{Pipe2me::Config.path(:tunnels)}/#{name}/id_rsa"
+      id_rsa = File.join Pipe2me::Config.path("tunnels"), name, "id_rsa"
       FileUtils.chmod 0600, id_rsa
 
       # create a command for each port
