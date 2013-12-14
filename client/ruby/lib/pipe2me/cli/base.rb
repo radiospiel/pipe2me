@@ -69,10 +69,26 @@ module Pipe2me::CLI
 
       self.banner "Options include:\n "
 
+      opt :verbose, "Be verbose"
+      opt :quiet, "Be quiet"
+      opt :silent, "Be silent"
+
       instance_eval(&block) if block
 
       stop_on SELF.command_names
     end
+
+    # -- determine UI verbosity -----------------------------------------------
+
+    if options[:verbose]    then UI.verbosity = 3
+    elsif options[:quiet]   then UI.verbosity = 0
+    elsif options[:silent]  then UI.verbosity = -1
+    else                         UI.verbosity = 2
+    end
+
+    UI.colored = false if UI.verbosity <= 0
+
+    # -- run subcommand -------------------------------------------------------
 
     cmd = ARGV.shift
     unless command_names.include?(cmd)

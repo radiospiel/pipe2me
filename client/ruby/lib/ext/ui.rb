@@ -90,6 +90,10 @@ module UI
   end
 
   def self.colored?
+    if @colored.nil?
+      @colored = STDERR.tty?
+    end
+
     @colored != false
   end
 
@@ -109,10 +113,12 @@ module UI
       msg = "#{color}#{msg}#{COLORS[:clear]}"
     end
 
-    source = caller[1]
-    source.gsub!( Dir.getwd, "." )
-    source.gsub!( File.expand_path("~"), "~" )
-    msg = "%-90s from: %s" % [ msg, source ]
+    if verbosity > 2
+      source = caller[1]
+      source.gsub!( Dir.getwd, "." )
+      source.gsub!( File.expand_path("~"), "~" )
+      msg = "%-90s from: %s" % [ msg, source ]
+    end
 
     STDERR.puts msg
 
