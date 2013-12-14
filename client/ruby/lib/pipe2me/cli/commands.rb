@@ -33,17 +33,24 @@ module Pipe2me::CLI
   banner "fetch a new tunnel setup"
   option :server, "Use pipe2.me server on that host", :default => "https://pipe2.me:5000"
   option :auth, "pipe2.me auth token",  :type => String, :required => true
-  option :port, "localhost port number", :default => 33411
+  option :port, "localhost port number", :type => Integer
   def setup
     Pipe2me::Config.server = options[:server]
 
     response = HTTP.post! "#{Pipe2me::Config.server}/subdomains", ""
     tunnel = response.parse["subdomain"]
 
-    name, token = tunnel.values_at "name", "token"
+    name, token, url = tunnel.values_at "name", "token", "url"
 
-    Pipe2me::Config.install_tunnel name, token
+    local_port = options[:port] || URI.parse(url).port
+
+    Pipe2me::Config.install_tunnel name, token, :server => Pipe2me::Config.server, :local_port => local_port
     Pipe2me::Provisioning.update name
+
+    UI.success "[#{name}] Configured tunnel #{url} => localhost:#{local_port}"
+    UI.info "[#{name}] Remember to restart the pipe2me service"
+
+    puts name
   end
 
   banner "Start tunnels"
@@ -55,7 +62,7 @@ module Pipe2me::CLI
   banner "Install init.d script"
   def install
     # install needed binaries
-    ::Installer.install "ssh", "autossh"
+    ::Installer.install "ssh"
 
     Pipe2me::Procfile.write      # rebuild procfile
   end

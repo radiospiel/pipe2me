@@ -85,7 +85,7 @@ module Pipe2me::Config
   # installs a new tunnel. The argument is the tunnel setting as received
   # from the control server. This method does not fetch or install the
   # provisioning files.
-  def install_tunnel(name, token)
+  def install_tunnel(name, token, local_info)
     path = self.path("tunnels/#{name}")
 
     File.open "#{path}/info.inc", "w" do |io|
@@ -94,7 +94,9 @@ module Pipe2me::Config
     end
 
     File.open "#{path}/local.inc", "w" do |io|
-      io.puts "SERVER=#{self.server}"
+      local_info.each do |key, value|
+        io.puts "#{key.to_s.upcase}=#{value}"
+      end
     end
   end
 
