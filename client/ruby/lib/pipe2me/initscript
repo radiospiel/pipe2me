@@ -1,0 +1,143 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          app
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Generated initscript for app
+# Description:       This file starts pipe2me pipes for a specific user. 
+#                    It should NOT be COPIED in /etc/init.d, but linked.
+#                    The owner of this file determines the pipe2me pipes
+#                    to run.
+### END INIT INFO
+
+# Author: @radiospiel
+
+# Do NOT "set -e"
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
+DESC="Run pipe2me pipes"
+
+SCRIPTNAME=$0
+OWNER=$(ls -ld $SCRIPTNAME | awk '{print $3 }')
+NAME="pipe2me-$OWNER"
+
+HOMEDIR=$(eval echo ~$OWNER)
+
+if [ $OWNER == "root" ]; then
+  PIDFILE=/var/run/$NAME.pid
+else
+  PIDFILE=$HOMEDIR/var/run/$NAME.pid
+fi
+mkdir -p $(dirname $PIDFILE)
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+[ -r /lib/lsb/init-functions ] &&. /lib/lsb/init-functions
+
+if ! type -t log_daemon_msg ; then
+
+log_daemon_msg() {
+  echo "$*" >&2
+}
+
+fi
+
+if ! type -t log_end_msg ; then
+
+log_end_msg() {
+  echo "Exit $SCRIPTNAME with status $1" >&2
+  exit $1
+}
+
+fi
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+  if [ $OWNER == `whoami` ]; then
+    bash -c 'cd ~/.pipe2me; ./pipe2me-runner & echo $!' > $PIDFILE
+  else
+    su - $OWNER -c 'cd ~/.pipe2me; ./pipe2me-runner & echo $!' > $PIDFILE
+  fi
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	kill `cat $PIDFILE`
+  rm $PIDFILE
+}
+
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $NAME"
+	do_start
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  stop)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $NAME"
+	do_stop
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  status)
+       status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+       ;;
+  #reload|force-reload)
+	#
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
+	#
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
+  restart|force-reload)
+	#
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
+	#
+	log_daemon_msg "Restarting $DESC $NAME"
+	do_stop
+	case "$?" in
+	  0|1)
+		do_start
+		case "$?" in
+			0) log_end_msg 0 ;;
+			1) log_end_msg 1 ;; # Old process is still running
+			*) log_end_msg 1 ;; # Failed to start
+		esac
+		;;
+	  *)
+	  	# Failed to stop
+		log_end_msg 1
+		;;
+	esac
+	;;
+  *)
+	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
+
+:

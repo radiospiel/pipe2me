@@ -11,18 +11,10 @@ module Installer
       path
     end
 
-    missing_binaries.each do |name|
-      installer.send(name)
-    end
+    return true if missing_binaries.empty?
 
-    puts "installing #{binary}"
-  end
-
-  def installer
-    @installer ||= OSX
-  end
-
-  module OSX
+    UI.error "The following binaries are missing or not in your path", *missing_binaries
+    false
   end
 
   def which(binary)

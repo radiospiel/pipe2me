@@ -10,7 +10,7 @@ module Sys
     stdin = options[:stdin]
 
     r = nil
-    UI.info *args
+    UI.debug *args
 
     IO.popen([*args.map(&:to_s)], 'w+') do |io|
       io.set_encoding("BINARY")
