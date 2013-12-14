@@ -1,4 +1,3 @@
-
 require "sys"
 require "ui"
 
@@ -50,7 +49,8 @@ module SSH
   public
 
   # create the data for the authorized_keys file.
-  def authorized_keys(subdomains)
+  def authorized_keys(subdomains = Subdomain.all)
+    subdomains.each(&:ssh_keygen!)
     subdomains.map do |subdomain|
       authorized_keys_line(subdomain)
     end.compact.join("\n")
@@ -59,12 +59,8 @@ module SSH
   # create the data for the authorized_keys file.
 
   def config(options)
-    expect! options => {
-      :pid_file => [String, nil],
-      :sshd_dir => String
-    }
-
     options[:pid_file] ||= File.join(options[:sshd_dir], "sshd.pid")
+    options[:tunnel_control] ||= TUNNEL_CONTROL
 
     template = File.read(__FILE__).split(/__END__\n/).last
     template.gsub(/\${{(.*)}}/) do |_|
@@ -91,9 +87,9 @@ __END__
 # possible, but leave them commented.  Uncommented options change a
 # default value.
 
-Port 4422
+#Port 22
 #AddressFamily any
-#ListenAddress 0.0.0.0
+ListenAddress ${{TUNNEL_CONTROL}}
 #ListenAddress ::
 
 # The default requires explicit activation of protocol 1

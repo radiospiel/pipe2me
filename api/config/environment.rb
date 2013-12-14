@@ -4,11 +4,10 @@
 
 VERSION = "0.1.0"
 
-# # The control interface and port, e.g. 0.0.0.0:4444
-TUNNEL_CONTROL_PORT = '127.0.0.1:4444'
-TUNNEL_USER = `whoami`.chomp
+# The control interface and port, e.g. 0.0.0.0:4444
+TUNNEL_CONTROL = ENV["TUNNEL_CONTROL"] || '127.0.0.1:4444'
+TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp
 
-#
 # Manage subdomains of these domains:
 DOMAIN = "pipe2.dev"
 
@@ -43,4 +42,3 @@ require "models/subdomain"
 # is actually connected. Yes, that sounds weird, but this is how
 # sinatra-active_record works (and we need this only for rake tasks anyway.)
 require "controllers/base"
-

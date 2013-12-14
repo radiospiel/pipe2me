@@ -94,6 +94,6 @@ class Subdomain < ActiveRecord::Base
   # autossh, to start the tunnel(s).
 
   def tunnel_private_url
-    "ssh://#{TUNNEL_USER}@#{TUNNEL_CONTROL_PORT}"
+    "ssh://#{TUNNEL_USER}@#{TUNNEL_CONTROL}"
   end
 end
