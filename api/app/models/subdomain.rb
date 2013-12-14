@@ -57,6 +57,13 @@ class Subdomain < ActiveRecord::Base
     self.token = Builder.choose_token unless token?
   end
 
+  # -- find by token or raise RecordNotFound. ---------------------------------
+
+  def self.find_by_token(token)
+    where(token: token).first ||
+      raise(ActiveRecord::RecordNotFound, "Couldn't find Subdomain with token #{token.inspect}")
+  end
+
   # -- SSH keys ---------------------------------------------------------------
 
   # generate and save ssh keys if missing.
@@ -83,8 +90,10 @@ class Subdomain < ActiveRecord::Base
     (port .. (port + PORTS_PER_SUBDOMAIN - 1)).to_a
   end
 
-  def self.find_by_token(token)
-    where(token: token).first ||
-      raise(ActiveRecord::RecordNotFound, "Couldn't find Subdomain with token #{token.inspect}")
+  # The private tunnel URL. This is where the client connects to, usually via
+  # autossh, to start the tunnel(s).
+
+  def tunnel_private_url
+    "ssh://#{TUNNEL_USER}@#{TUNNEL_CONTROL_PORT}"
   end
 end

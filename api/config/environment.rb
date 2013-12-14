@@ -1,7 +1,14 @@
 # -- configure subdomains -----------------------------------------------------
 
+# The pipe2me version number.
+
 VERSION = "0.1.0"
 
+# # The control interface and port, e.g. 0.0.0.0:4444
+TUNNEL_CONTROL_PORT = '127.0.0.1:4444'
+TUNNEL_USER = `whoami`.chomp
+
+#
 # Manage subdomains of these domains:
 DOMAIN = "pipe2.dev"
 

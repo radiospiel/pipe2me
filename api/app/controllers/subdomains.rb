@@ -49,7 +49,8 @@ class Controllers::Subdomains < Controllers::Base
       ports:            subdomain.ports,
       port:             subdomain.port,
       name:             subdomain.name,
-      url:              subdomain.url
+      url:              subdomain.url,
+      tunnel:           subdomain.tunnel_private_url
     }
 
     if auto_renderer == :tar
