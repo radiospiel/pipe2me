@@ -4,4 +4,16 @@ $:.unshift "#{File.dirname(__FILE__)}/../lib"
 require "pipe2me"
 require "pipe2me/cli"
 
-Pipe2me::CLI.run "pipe2.me command line client V#{Pipe2me::VERSION}; (c) radiospiel, 2013."
+begin
+  Pipe2me::CLI.run "pipe2.me command line client V#{Pipe2me::VERSION}; (c) radiospiel, 2013."
+rescue
+  if UI.severity >= 2
+    UI.error $!
+    raise
+  elsif UI.severity >= 0
+    UI.error $!
+  else
+    STDERR.puts $!
+  end
+  exit 1
+end
