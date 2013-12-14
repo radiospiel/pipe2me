@@ -1,4 +1,7 @@
-# -- configure subdomains -----------------------------------------------------
+require 'dotenv'
+Dotenv.load
+
+# -- configuration ------------------------------------------------------------
 
 # The pipe2me version number.
 
@@ -12,11 +15,18 @@ TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp
 DOMAIN = "pipe2.dev"
 
 # Manage these ports:
-PORTS = 10000...40000
+port_range = ENV["TUNNEL_PORT_RANGE"] || "10000...40000"
+unless port_range =~ /^(\d+)...(\d+)$/
+  raise ArgumentError, "Invalid TUNNEL_PORT_RANGE setting: #{port_range.inspect}"
+end
+
+PORTS = $1.to_i ... $2.to_i
 
 # How many ports per subdomain? Each subdomain gets the same number of ports.
 # NOTE: THIS VALUE CANNOT BE CHANGED!
-PORTS_PER_SUBDOMAIN = 1
+PORTS_PER_SUBDOMAIN = Integer(ENV["TUNNEL_PORTS_PER_SUBDOMAIN"] || 1)
+
+# -- start app ----------------------------------------------------------------
 
 ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
 STDERR.puts "Starting app in #{ROOT}"
@@ -25,7 +35,7 @@ $: << "#{ROOT}/app"
 $: << "#{ROOT}/lib"
 
 RACK_ENV = ENV["RACK_ENV"] || "development"
-DATABASE_URL="sqlite3:///#{ROOT}/var/#{RACK_ENV}.sqlite3"
+DATABASE_URL=ENV["DATABASE_URL"] || "sqlite3:///#{ROOT}/var/#{RACK_ENV}.sqlite3"
 
 # -- load initializers --------------------------------------------------------
 
