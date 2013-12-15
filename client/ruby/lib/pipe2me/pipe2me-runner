@@ -41,7 +41,8 @@ store_pid() {
 # This starts a command asynchronously and stores its pid in a list for use
 # later on in the script.
 start_command() {
-  sh -c "$1" &
+  # todo: add logging; e.g. via logger -s -t $name
+  sh -c "$1" 2>&1 &
   pid="$!"
   store_pid "$pid"
 }
@@ -69,10 +70,8 @@ PROCFILE=${1:-'Procfile'}
 while read line || [ -n "$line" ]; do
   name=${line%%:*}
   command=${line#*: }
-  (
-    start_command "$command"
-    echo "started with ${pid}: ${command}"
-  ) 2>&1 | logger -s -t "${name}"
+  start_command "$command" "$name"
+  echo "$name: started with ${pid}"
 done < "$PROCFILE"
 
 # ## Cleanup
@@ -82,9 +81,11 @@ done < "$PROCFILE"
 # should probably go at some point.
 onexit() {
   echo SIGINT received
-  echo sending SIGTERM to all processes
+  echo sending SIGTERM to all processes ${pids[*]}
   kill ${pids[*]} &>/dev/null
   sleep 1
+  echo sending SIGKILL to all remaining processes ${pids[*]}
+  kill -9 ${pids[*]} &>/dev/null
 }
 trap onexit SIGINT SIGTERM EXIT
 
