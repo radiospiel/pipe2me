@@ -9,28 +9,16 @@ module Pipe2me::Provisioning
   def update(name)
     info = Pipe2me::Config.tunnel(name)
 
-    response = HTTP.get! "#{info[:server]}/subdomains/#{info[:token]}.tar"
-    install_response(response)
-
-    UI.debug "#{name}: Received provisioning #{response.bytesize} bytes"
+    update_item info, "id_rsa"
+    update_item info, "id_rsa.pub"
   end
 
   private
 
-  # unpacks and installs the tunnel response from the server. This method
-  # usually overrides the "info.inc" file.
-  def install_response(response)
-    tunnels = Pipe2me::Config.path("tunnels")
+  def update_item(info, item)
+    tunnel_url = "#{info[:server]}/subdomains/#{info[:token]}"
+    path = File.join Pipe2me::Config.path("tunnels/#{info[:name]}"), item
 
-    Tar.extract StringIO.new(response) do |path, data|
-      next if path == "subdomain/info.inc"
-
-      target_path = File.join tunnels, path.gsub(/^subdomain\//, "")
-      FileUtils.mkdir_p File.dirname(target_path)
-
-      File.open(target_path, "w") do |io|
-        io.write data
-      end
-    end
+    File.atomic_write path, HTTP.get!("#{tunnel_url}/#{item}")
   end
 end

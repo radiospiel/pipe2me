@@ -37,7 +37,8 @@ module Pipe2me::CLI
   def setup
     Pipe2me::Config.server = options[:server]
 
-    response = HTTP.post! "#{Pipe2me::Config.server}/subdomains", ""
+    # TODO: escape options
+    response = HTTP.post! "#{Pipe2me::Config.server}/subdomains/#{options[:auth]}", ""
     tunnel = response.parse["subdomain"]
 
     name, token, url = tunnel.values_at "name", "token", "url"

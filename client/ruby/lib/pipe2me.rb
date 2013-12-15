@@ -9,6 +9,6 @@ require_relative "pipe2me/provisioning"
 
 require_relative "ext/http"
 require_relative "ext/sys"
-require_relative "ext/tar"
 require_relative "ext/ui"
 require_relative "ext/installer"
+require_relative "ext/file_ext"

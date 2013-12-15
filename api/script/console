@@ -15,7 +15,11 @@ end
 
 Dir.chdir File.join(File.dirname(__FILE__), "..")
 
-$: << "lib"
-#require "#{File.dirname(__FILE__)}/../init"
 require_relative "../config/environment"
+
+if RACK_ENV == "development"
+  require "etest-unit"
+end
+$: << "app/model"
+
 IRB.start

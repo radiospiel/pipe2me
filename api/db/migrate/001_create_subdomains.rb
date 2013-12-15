@@ -1,9 +1,6 @@
 class CreateSubdomains < ActiveRecord::Migration
   def change
     create_table :subdomains do |t|
-      # an auth token for this subdomain
-      t.string  :token
-
       # the hostname of the subdomain's endpoint.
       t.string  :endpoint
 
@@ -24,7 +21,6 @@ class CreateSubdomains < ActiveRecord::Migration
       # subdomain time stamps
       t.timestamps
 
-      t.index   :token
       t.index   :port
     end
   end

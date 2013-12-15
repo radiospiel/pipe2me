@@ -82,5 +82,3 @@ class Controllers::Base < Sinatra::Base
     render_error 404
   end
 end
-
-require_relative "./auto_renderer"

@@ -13,7 +13,6 @@
 ActiveRecord::Schema.define(version: 1) do
 
   create_table "subdomains", force: true do |t|
-    t.string   "token"
     t.string   "endpoint"
     t.string   "name"
     t.string   "scheme",          default: "http"
@@ -25,6 +24,5 @@ ActiveRecord::Schema.define(version: 1) do
   end
 
   add_index "subdomains", ["port"], name: "index_subdomains_on_port"
-  add_index "subdomains", ["token"], name: "index_subdomains_on_token"
 
 end

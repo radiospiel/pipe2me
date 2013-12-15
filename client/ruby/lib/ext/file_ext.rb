@@ -1,3 +1,5 @@
+require "tempfile"
+
 class File
   def self.atomic_write(path, data=nil, &block)
     tmpfile = Tempfile.new(File.basename(path))

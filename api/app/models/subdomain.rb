@@ -52,16 +52,19 @@ class Subdomain < ActiveRecord::Base
   def initialize_defaults
     require_relative "subdomain/builder"
 
+    self.id ||= SecureRandom.random_number(1 << 63)
     self.port = Builder.choose_port unless port?
     self.name = Builder.choose_name unless name?
-    self.token = Builder.choose_token unless token?
   end
 
   # -- find by token or raise RecordNotFound. ---------------------------------
 
+  def token
+    id.to_s
+  end
+
   def self.find_by_token(token)
-    where(token: token).first ||
-      raise(ActiveRecord::RecordNotFound, "Couldn't find Subdomain with token #{token.inspect}")
+    find Integer(token)
   end
 
   # -- SSH keys ---------------------------------------------------------------

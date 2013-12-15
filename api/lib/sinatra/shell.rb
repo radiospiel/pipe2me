@@ -38,6 +38,3 @@ module Sinatra::Shell
     SELF.format(obj, prefix)
   end
 end
-
-Rack::Mime::MIME_TYPES[".shell"] ||= "application/x-shell"
-Rack::Mime::MIME_TYPES[".sh"] ||= "application/x-sh"
