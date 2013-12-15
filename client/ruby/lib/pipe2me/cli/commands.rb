@@ -9,12 +9,12 @@ module Pipe2me::CLI
 
   banner "short list all tunnels"
   def ls(*args)
-    Pipe2me::Config.tunnels(*args).each do |name|
+    Pipe2me::Config.configured_tunnels(*args).each do |name|
       puts name
     end
   end
 
-  banner "list all tunnels"
+  banner "list all accessible tunnels"
   def list(*args)
     Pipe2me::Config.tunnels(*args).each do |name|
       puts name
