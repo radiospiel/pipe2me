@@ -6,30 +6,30 @@ module Pipe2me::Procfile
     "#{Pipe2me::Config.path}/Procfile"
   end
 
-  def write
-    File.open(path, "w") do |io|
-      Pipe2me::Config.tunnels.each do |name|
-        idx = 0
+  def write(tunnels)
+    procfile = ""
 
-        commands_for(name) do |cmd|
-          idx += 1
-          io.puts "#{name.split(".", 2).first}-#{idx}: #{cmd.join(" ")}\n"
-        end
+    tunnels.each do |name|
+      idx = 0
+      commands_for(name) do |cmd|
+        idx += 1
+        procfile << "#{name.split(".", 2).first}-#{idx}: #{cmd.join(" ")}\n"
       end
     end
 
-    UI.success "Wrote #{path}"
+    File.atomic_write(path, procfile)
 
-    FileUtils.cp "#{File.dirname(__FILE__)}/pipe2me-runner", Pipe2me::Config.path, :verbose => true
-    FileUtils.cp "#{File.dirname(__FILE__)}/initscript", Pipe2me::Config.path, :verbose => true
+    UI.success "Wrote #{path}"
+    UI.info procfile
+
+    FileUtils.cp "#{File.dirname(__FILE__)}/pipe2me-runner", Pipe2me::Config.path #, :verbose => true
+    FileUtils.cp "#{File.dirname(__FILE__)}/initscript", Pipe2me::Config.path #, :verbose => true
   end
 
   private
 
   def commands_for(name)
     info = Pipe2me::Config.tunnel(name)
-
-    UI.info "info", info
 
     name, ports, tunnel = info.values_at :name, :ports, :tunnel
     tunnel_uri = URI.parse(tunnel)

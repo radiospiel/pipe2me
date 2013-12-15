@@ -71,7 +71,7 @@ while read line || [ -n "$line" ]; do
   name=${line%%:*}
   command=${line#*: }
   start_command "$command" "$name"
-  echo "$name: started with ${pid}"
+  echo "$name: started at PID ${pid}"
 done < "$PROCFILE"
 
 # ## Cleanup
@@ -84,8 +84,8 @@ onexit() {
   echo sending SIGTERM to all processes ${pids[*]}
   kill ${pids[*]} &>/dev/null
   sleep 1
-  echo sending SIGKILL to all remaining processes ${pids[*]}
-  kill -9 ${pids[*]} &>/dev/null
+  # echo sending SIGKILL to all remaining processes ${pids[*]}
+  # kill -9 ${pids[*]} &>/dev/null
 }
 trap onexit SIGINT SIGTERM EXIT
 
