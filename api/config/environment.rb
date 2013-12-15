@@ -10,6 +10,8 @@ VERSION = "0.1.0"
 # Manage subdomains of these domains:
 DOMAIN = ENV["DOMAIN"] || "pipe2.dev"
 
+puts "pipe2me managing #{DOMAIN}"
+
 # The control interface and port, e.g. 0.0.0.0:4444
 TUNNEL_CONTROL = ENV["TUNNEL_CONTROL"] || "#{DOMAIN}:4444"
 TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp

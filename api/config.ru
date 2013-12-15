@@ -79,23 +79,3 @@ run Rack::URLMap.new(
   "/"               => Controllers::Info.new,
   "/subdomains"     => Controllers::Subdomains.new
 )
-
-require "eventmachine"
-require "em-http"
-
-EM.next_tick do
-  server_options = Rack::Server.new.options
-  port = server_options[:Port]
-
-  url = "http://#{DOMAIN}:#{port}"
-
-  http = EventMachine::HttpRequest.new(url).get
-  http.errback do
-    STDERR.puts "Trouble connecting to #{url}. Is DOMAIN properly configured?"
-    EM.stop
-  end
-
-  http.callback do
-    STDERR.puts "Verified connection to #{url}."
-  end
-end
