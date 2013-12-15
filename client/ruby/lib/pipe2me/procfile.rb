@@ -29,6 +29,8 @@ module Pipe2me::Procfile
   def commands_for(name)
     info = Pipe2me::Config.tunnel(name)
 
+    UI.info "info", info
+
     name, ports, tunnel = info.values_at :name, :ports, :tunnel
     tunnel_uri = URI.parse(tunnel)
 

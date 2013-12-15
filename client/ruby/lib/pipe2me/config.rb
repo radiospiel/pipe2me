@@ -58,46 +58,35 @@ module Pipe2me::Config
     tunnel_info.merge(local_info)
   end
 
+  def tunnel_download(name, asset)
+    info = tunnel(name)
+
+    remote_base = "#{info[:server]}/subdomains/#{info[:token]}"
+    local_base = path("tunnels/#{info[:name]}")
+
+    url = "#{remote_base}/#{asset}"
+    path  = "#{local_base}/#{asset}"
+    UI.debug "#{url} => #{path}"
+    File.atomic_write path, HTTP.get!(url)
+  end
+
   private
 
   def parse_info(*path)
     path = File.join *path
-
-    arrays = {}
-
-    File.readlines(path).inject({}) do |hsh, line|
-      key, value = line.split(/\s*=\s*/, 2)
-      value.gsub!(/\s*$/, "")
-      value = Integer(value) rescue value
-
-      if key =~ /^([^_]+)_(\d+)$/
-        ary = arrays[$1] || []
-        ary[$2.to_i] = value
-        key, value = $1, ary
-      end
-
-      hsh.update key.downcase.to_sym => value
-    end
+    ShellFormat.parse File.read(path)
   end
 
   public
 
-  # installs a new tunnel. The argument is the tunnel setting as received
-  # from the control server. This method does not fetch or install the
-  # provisioning files.
-  def install_tunnel(name, token, local_info)
+  def install_tunnel(server_info, local_info)
+    name = server_info[:name] || raise(ArgumentError, "Missing :name information")
+
     path = self.path("tunnels/#{name}")
+    File.atomic_write File.join(path, "info.inc"), ShellFormat.dump(server_info)
+    File.atomic_write File.join(path, "local.inc"), ShellFormat.dump(local_info)
 
-    File.open "#{path}/info.inc", "w" do |io|
-      io.puts "NAME=#{name}"
-      io.puts "TOKEN=#{token}"
-    end
-
-    File.open "#{path}/local.inc", "w" do |io|
-      local_info.each do |key, value|
-        io.puts "#{key.to_s.upcase}=#{value}"
-      end
-    end
+    name
   end
 
   def uninstall_tunnel(name)

@@ -1,9 +1,11 @@
-require "sinatra/shell"
+require "shell_format"
+require "sinatra/json"
 
 class Controllers::Subdomains < Controllers::Base
   set :sourcefile, __FILE__
 
-  helpers Sinatra::Shell
+  helpers ::ShellFormat
+  helpers Sinatra::JSON
 
   # -- index: get all subdomains ----------------------------------------------
 
@@ -17,15 +19,14 @@ class Controllers::Subdomains < Controllers::Base
 
   def index
     subdomains = Subdomain.all
-    attrs = subdomains.map { |subdomain| public_attributes(subdomain) }
-    shell subdomains: attrs
+    shell subdomains: subdomains.map(&:token)
   end
 
   # -- create: create a new subdomain -----------------------------------------
 
   post "/:auth" do
     subdomain = Subdomain.create!
-    shell subdomain: public_attributes(subdomain)
+    shell public_attributes(subdomain)
   end
 
   # -- show: get an individual subdomain --------------------------------------
@@ -33,7 +34,7 @@ class Controllers::Subdomains < Controllers::Base
   # return the token configuration
   get "/:token" do
     subdomain = Subdomain.find_by_token(params[:token])
-    shell subdomain: public_attributes(subdomain)
+    shell public_attributes(subdomain)
   end
 
   get "/:token/id_rsa" do

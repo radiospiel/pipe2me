@@ -1,7 +1,7 @@
 module Pipe2me::CLI
   banner "delete one or more tunnel"
-  def rm(arg)
-    Pipe2me::Config.tunnels(arg).each do |name|
+  def rm(arg, *args)
+    Pipe2me::Config.tunnels(arg, *args).each do |name|
       Pipe2me::Config.uninstall_tunnel name
     end
   end
@@ -24,9 +24,10 @@ module Pipe2me::CLI
   end
 
   banner "update provisioning for all tunnels"
-  def update
-    Pipe2me::Config.tunnels.each do |name|
-      Pipe2me::Provisioning.update name
+  def update(*args)
+    Pipe2me::Config.tunnels(*args).each do |name|
+      Pipe2me::Config.tunnel_download name, "id_rsa"
+      Pipe2me::Config.tunnel_download name, "id_rsa.pub"
     end
   end
 
@@ -37,20 +38,17 @@ module Pipe2me::CLI
   def setup
     Pipe2me::Config.server = options[:server]
 
-    # TODO: escape options
+    # [todo] escape auth option
     response = HTTP.post! "#{Pipe2me::Config.server}/subdomains/#{options[:auth]}", ""
-    tunnel = response.parse["subdomain"]
 
-    name, token, url = tunnel.values_at "name", "token", "url"
+    server_info = ShellFormat.parse(response)
 
-    local_port = options[:port] || URI.parse(url).port
+    server_uri = URI.parse server_info[:url]
+    name = Pipe2me::Config.install_tunnel server_info,
+      server:     Pipe2me::Config.server,
+      local_port: (options[:port] || server_uri.port)
 
-    Pipe2me::Config.install_tunnel name, token, :server => Pipe2me::Config.server, :local_port => local_port
-    Pipe2me::Provisioning.update name
-
-    UI.success "[#{name}] Configured tunnel #{url} => localhost:#{local_port}"
-    UI.info "[#{name}] Remember to restart the pipe2me service"
-
+    update name
     puts name
   end
 
