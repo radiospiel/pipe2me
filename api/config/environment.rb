@@ -7,12 +7,12 @@ Dotenv.load
 
 VERSION = "0.1.0"
 
-# The control interface and port, e.g. 0.0.0.0:4444
-TUNNEL_CONTROL = ENV["TUNNEL_CONTROL"] || '127.0.0.1:4444'
-TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp
-
 # Manage subdomains of these domains:
-DOMAIN = "pipe2.dev"
+DOMAIN = ENV["DOMAIN"] || "pipe2.dev"
+
+# The control interface and port, e.g. 0.0.0.0:4444
+TUNNEL_CONTROL = ENV["TUNNEL_CONTROL"] || "#{DOMAIN}:4444"
+TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp
 
 # Manage these ports:
 port_range = ENV["TUNNEL_PORT_RANGE"] || "10000...40000"
