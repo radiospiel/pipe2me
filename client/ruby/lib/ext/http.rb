@@ -202,7 +202,5 @@ module HTTP
     else
       Response.new(response, uri.to_s, original_url)
     end
-  rescue
-    raise "#{uri}: #{$!}"
   end
 end
