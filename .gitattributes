@@ -1,1 +1,2 @@
 *.rb filter=trimWhitespace
+*.ru filter=trimWhitespace

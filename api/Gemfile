@@ -4,9 +4,8 @@ gem "foreman"
 
 # -- web server framework -----------------------------------------------------
 
-group :production do
-  gem "thin"
-end
+gem "thin"
+gem "em-http-request"
 
 gem "rack"
 gem "rack_csrf"
