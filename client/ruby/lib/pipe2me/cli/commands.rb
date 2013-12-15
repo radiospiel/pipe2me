@@ -1,8 +1,9 @@
 module Pipe2me::CLI
   banner "delete one or more tunnel"
   def rm(arg, *args)
-    Pipe2me::Config.tunnels(arg, *args).each do |name|
+    Pipe2me::Config.configured_tunnels(arg, *args).each do |name|
       Pipe2me::Config.uninstall_tunnel name
+      UI.success "uninstalled tunnel", name
     end
   end
 
@@ -20,6 +21,15 @@ module Pipe2me::CLI
       Pipe2me::Config.tunnel(name).each do |k,v|
         puts "  #{k}: #{v}"
       end
+    end
+  end
+
+  banner "delete all stale tunnels"
+  def clean(*args)
+    Pipe2me::Config.configured_tunnels(*args).each do |name|
+      next if Pipe2me::Config.remote_tunnel?(name)
+      Pipe2me::Config.uninstall_tunnel name
+      UI.success "uninstalled tunnel", name
     end
   end
 
@@ -54,7 +64,9 @@ module Pipe2me::CLI
 
   banner "Start tunnels"
   def start
-    Pipe2me::Tunnel.start_all
+    Pipe2me::Procfile.write Pipe2me::Config.tunnels
+    Dir.chdir Pipe2me::Config.path
+    Kernel.exec "./pipe2me-runner"
   end
 
   # Verify installation

@@ -4,7 +4,6 @@ end
 require_relative "pipe2me/version"
 require_relative "pipe2me/config"
 require_relative "pipe2me/procfile"
-require_relative "pipe2me/tunnel"
 
 require_relative "ext/shell_format"
 require_relative "ext/http"

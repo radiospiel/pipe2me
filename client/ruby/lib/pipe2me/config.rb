@@ -37,16 +37,36 @@ module Pipe2me::Config
 
   # -- Tunnel information -----------------------------------------------------
 
-  # returns an array with the names of all tunnels.
-  def tunnels(*patterns)
+  def configured_tunnels(*patterns)
     tunnels = Dir.glob("#{path("tunnels")}/*").sort.map do |dirname|
       File.basename(dirname)
     end
+
+    # limit tunnel selection to those matching pattern
     return tunnels if patterns.empty?
 
     tunnels.select do |tunnel|
-      patterns.any? do |pattern| File.fnmatch(pattern, tunnel) end
+      patterns.any? { |pattern| File.fnmatch(pattern, tunnel) }
     end
+  end
+
+  # returns an array with the names of all tunnels.
+  def tunnels(*patterns)
+    tunnels = configured_tunnels(*patterns)
+
+    tunnels.select do |name|
+      next true if remote_tunnel?(name)
+
+      info = tunnel(name)
+      UI.warn "#{name}: Missing tunnel (at #{info[:server]})"
+      false
+    end
+  end
+
+  # returns all tunnels that exist remotely
+  def remote_tunnel?(name)
+    info = tunnel(name)
+    HTTP.get? "#{info[:server]}/subdomains/#{info[:token]}"
   end
 
   # returns an info hash about a specific tunnel.
