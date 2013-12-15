@@ -14,23 +14,27 @@ namespace :sshd do
   # -- files and directories
   directory sshd_dir
 
-  task :host_key => sshd_dir do
+  file host_key => sshd_dir do
     system "ssh-keygen -t rsa -f #{host_key} -N ''"
   end
 
-  task :sshd_config => :host_key do
+  task :host_key => host_key
+
+  file sshd_config => :host_key do
     File.atomic_write sshd_config, SSH.config(:sshd_dir => sshd_dir, :pid_file => "#{var_dir}/sshd.pid")
     STDERR.puts "Created #{sshd_config}"
   end
 
-  # -- write the authorized_keys file for all subdomains.
+  task :sshd_config => sshd_config
+
+  # -- write authorized_keys file for all subdomains.
+
   file authorized_keys => sshd_dir do
     File.atomic_write authorized_keys, SSH.authorized_keys
-  end
-
-  task :authorized_keys => authorized_keys do
     STDERR.puts "Created #{authorized_keys}"
   end
+
+  task :authorized_keys => authorized_keys
 
   desc "Start sshd server non-daemonized"
   task :exec => [ :authorized_keys, :sshd_config ] do
