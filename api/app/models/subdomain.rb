@@ -99,4 +99,14 @@ class Subdomain < ActiveRecord::Base
   def tunnel_private_url
     "ssh://#{TUNNEL_USER}@#{TUNNEL_CONTROL}"
   end
+
+  # -- OpenSSL cerificate -----------------------------------------------------
+
+  def openssl_certgen!
+    return if openssl_certificate?
+
+    Sys.sys! "#{ROOT}/ca/mk-certificate", name
+    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{name}.pem"
+    update_attributes! :openssl_certificate => openssl_certificate
+  end
 end

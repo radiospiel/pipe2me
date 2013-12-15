@@ -51,6 +51,13 @@ class Controllers::Subdomains < Controllers::Base
     subdomain.ssh_public_key
   end
 
+  get "/:token/cert.pem" do
+    subdomain = Subdomain.find_by_token(params[:token])
+    content_type :text
+    subdomain.openssl_certgen!
+    subdomain.openssl_certificate
+  end
+
   private
 
   def public_attributes(subdomain)

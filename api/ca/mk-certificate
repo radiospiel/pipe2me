@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Generate a SSL certificate for a specific domain name. To be called
+# via the kinko command runner (i.e. 
+#
+#   kinko certificate domainname
+#
+# The generated certificate is in 
+
+# kinko certificate domainname
+
+# openssl settings
+VALIDITY=7300
+ROOT=$(cd `dirname $0`/.. && pwd)
+HERE=$(cd `dirname $0` && pwd)
+
+export OPENSSL_DIR=$ROOT/var/openssl
+
+. $HERE/ca-settings
+
+certname=$1
+if [ -z "$certname" ]; then
+  echo "Usage: $0 <subdomain>"
+  exit 1
+fi
+
+# [todo] check certname is valid
+#
+# [todo] check that certificate does not exist yet. Should we use ssl.conf's
+# unique_subject setting?.
+
+mkdir -p $OPENSSL_DIR/private/
+mkdir -p $OPENSSL_DIR/csr/
+mkdir -p $OPENSSL_DIR/certs/
+
+#create certificate/private key
+openssl req \
+  -config $HERE/ssl.conf \
+  -new \
+  -nodes \
+  -keyout "$OPENSSL_DIR/private/$certname.pem" \
+  -out "$OPENSSL_DIR/csr/$certname.csr" \
+  -days $VALIDITY \
+  -subj "/C=$CA_COUNTRY/ST=$CA_STATE/L=$CA_CITY/O=$CA_ORGANIZATION/OU=$CA_ORG_UNIT/CN=$certname"
+
+openssl ca -batch \
+  -config $HERE/ssl.conf \
+  -policy policy_anything \
+  -out "$OPENSSL_DIR/certs/$certname.pem" \
+  -infiles "$OPENSSL_DIR/csr/$certname.csr"

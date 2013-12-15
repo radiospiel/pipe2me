@@ -10,17 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 1) do
+ActiveRecord::Schema.define(version: 2) do
 
   create_table "subdomains", force: true do |t|
     t.string   "endpoint"
     t.string   "name"
-    t.string   "scheme",          default: "http"
+    t.string   "scheme",              default: "http"
     t.integer  "port"
     t.text     "ssh_public_key"
     t.text     "ssh_private_key"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "openssl_certificate"
   end
 
   add_index "subdomains", ["port"], name: "index_subdomains_on_port"
