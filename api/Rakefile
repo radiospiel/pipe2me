@@ -36,7 +36,8 @@ namespace :sshd do
   task :exec => [ :authorized_keys, :sshd_config ] do
     File.atomic_write authorized_keys, SSH.authorized_keys
 
-    STDERR.puts [ "/usr/sbin/sshd", "-D", "-e", "-f", sshd_config ] * " "
-    Kernel.exec "/usr/sbin/sshd", "-D", "-e", "-d", "-f", sshd_config
+    command = [ "/usr/sbin/sshd", "-D", "-e", "-f", sshd_config ]
+    STDERR.puts "Running #{command.join(" ")}"
+    Kernel.exec *command
   end
 end
