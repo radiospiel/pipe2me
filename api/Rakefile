@@ -14,11 +14,11 @@ namespace :sshd do
   # -- files and directories
   directory sshd_dir
 
-  file host_key => sshd_dir do
+  task :host_key => sshd_dir do
     system "ssh-keygen -t rsa -f #{host_key} -N ''"
   end
 
-  task :sshd_config do
+  task :sshd_config => :host_key do
     File.atomic_write sshd_config, SSH.config(:sshd_dir => sshd_dir, :pid_file => "#{var_dir}/sshd.pid")
     STDERR.puts "Created #{sshd_config}"
   end
