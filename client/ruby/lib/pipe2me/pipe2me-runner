@@ -69,8 +69,10 @@ PROCFILE=${1:-'Procfile'}
 while read line || [ -n "$line" ]; do
   name=${line%%:*}
   command=${line#*: }
-  start_command "$command"
-  echo "'${command}' started with pid ${pid}" # | logger -t "${name}"
+  (
+    start_command "$command"
+    echo "started with ${pid}: ${command}"
+  ) 2>&1 | logger -s -t "${name}"
 done < "$PROCFILE"
 
 # ## Cleanup
