@@ -1,2 +1,3 @@
 *.rb filter=trimWhitespace
 *.ru filter=trimWhitespace
+Rakefile filter=trimWhitespace

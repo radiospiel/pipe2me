@@ -1,6 +1,8 @@
 require 'dotenv'
 Dotenv.load
 
+ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
+
 # -- configuration ------------------------------------------------------------
 
 # The pipe2me version number.
@@ -13,7 +15,9 @@ DOMAIN = ENV["DOMAIN"] || "pipe2.dev"
 puts "pipe2me managing #{DOMAIN}"
 
 # The control interface and port, e.g. 0.0.0.0:4444
-TUNNEL_CONTROL = ENV["TUNNEL_CONTROL"] || "#{DOMAIN}:4444"
+SSHD_LISTEN_ADDRESS = ENV["SSHD_LISTEN_ADDRESS"] || "#{DOMAIN}:4444"
+SSHD_DIR = "#{ROOT}/var/sshd"
+
 TUNNEL_USER    = ENV["TUNNEL_USER"] || `whoami`.chomp
 
 # Manage these ports:
@@ -30,7 +34,6 @@ PORTS_PER_SUBDOMAIN = Integer(ENV["TUNNEL_PORTS_PER_SUBDOMAIN"] || 1)
 
 # -- start app ----------------------------------------------------------------
 
-ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
 STDERR.puts "Starting app in #{ROOT}"
 
 $: << "#{ROOT}/app"

@@ -1,6 +1,3 @@
-# require "wordize"
-# require "ssh"
-
 #
 # A Subdomain object models a single subdomain registration. Each subdomain
 # manages a number of ports. These ports are assigned by the server in the
@@ -86,7 +83,7 @@ class Subdomain < ActiveRecord::Base
   # autossh, to start the tunnel(s).
 
   def tunnel_private_url
-    "ssh://#{TUNNEL_USER}@#{TUNNEL_CONTROL}"
+    "ssh://#{TUNNEL_USER}@#{SSHD_LISTEN_ADDRESS}"
   end
 
   # -- OpenSSL cerificate -----------------------------------------------------
@@ -101,16 +98,17 @@ class Subdomain < ActiveRecord::Base
 
   # -- SSH keys ---------------------------------------------------------------
 
+  scope :with_ssh_keys, -> { where "ssh_public_key IS NOT NULL " }
+  scope :without_ssh_keys, -> { where "ssh_public_key IS NULL " }
+
   # generate and save ssh keys if missing.
   def ssh_keygen!
-    return if has_ssh_key?
+    return if ssh_public_key.present? && ssh_private_key.present?
 
-    ssh_public_key, ssh_private_key = SSH.keygen(fqdn)
+    require "sshd"
+
+    ssh_public_key, ssh_private_key = SSHD.keygen(fqdn)
     update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
-  end
-
-  # does this record has ssh keys?
-  def has_ssh_key?
-    ssh_public_key.present? && ssh_private_key.present?
+    SSHD.write_authorized_keys
   end
 end

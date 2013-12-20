@@ -1,77 +1,3 @@
-require "sys"
-require "ui"
-
-module SSH
-  extend self
-
-  def keygen(name)
-    UI.benchmark "[#{name}] create ssh identity" do
-      Dir.mktmpdir do |dir|
-        Sys.sys! "ssh-keygen",
-           "-f", "#{dir}/id_rsa",
-           "-t", "rsa",
-           "-C", name,
-           "-N", ""
-
-        [ File.read("#{dir}/id_rsa.pub"), File.read("#{dir}/id_rsa") ]
-      end
-    end
-  end
-
-  private
-
-  # AUTHORIZED_KEYS_OPTIONS disable a number of sshd options, that are
-  # usually enabled by default. For some reason we need a pty, at least
-  # on some systems (Debian).
-  AUTHORIZED_KEYS_OPTIONS = %w(
-    command="/bin/false"
-    no-agent-forwarding
-    #no-pty
-    no-user-rc
-    no-X11-forwarding
-  )
-
-  # returns a single line for the authorized_keys file. For details see
-  # sshd(8), but a quick remark: a line looks like this:
-  #
-  #  option,option,option.. pub_key_data name
-  #
-  # and the options declare which ports may be used for which public key.
-  def authorized_keys_line(subdomain)
-    return unless subdomain.ssh_public_key?
-
-    options = AUTHORIZED_KEYS_OPTIONS.grep(/^[^#]/)
-    options += subdomain.ports.map { |port|  "permitopen=\":#{port}\"" }
-
-    "#{options.join(",")} #{subdomain.ssh_public_key}"
-  end
-
-  public
-
-  # create the data for the authorized_keys file.
-  def authorized_keys(subdomains = Subdomain.all)
-    subdomains.each(&:ssh_keygen!)
-    subdomains.map do |subdomain|
-      authorized_keys_line(subdomain)
-    end.compact.join("\n")
-  end
-
-  # create the data for the authorized_keys file.
-
-  def config(options)
-    options[:pid_file] ||= File.join(options[:sshd_dir], "sshd.pid")
-    options[:tunnel_control] ||= TUNNEL_CONTROL
-
-    template = File.read(__FILE__).split(/__END__\n/).last
-    template.gsub(/\${{(.*)}}/) do |_|
-      key = $1.underscore.to_sym
-      options[key] || raise(ArgumentError, "Missing option #{key.inspect}")
-    end
-  end
-end
-
-__END__
-
 # This sshd_config file is derived from the following OpenBSD default config
 # file, and is adapted for use with the kinko server
 #
@@ -89,7 +15,7 @@ __END__
 
 #Port 22
 #AddressFamily any
-ListenAddress ${{TUNNEL_CONTROL}}
+ListenAddress <%= SSHD_LISTEN_ADDRESS %>
 #ListenAddress ::
 
 # The default requires explicit activation of protocol 1
@@ -98,8 +24,8 @@ ListenAddress ${{TUNNEL_CONTROL}}
 # HostKey for protocol version 1
 #HostKey /etc/ssh/ssh_host_key
 # HostKeys for protocol version 2
-HostKey ${{SSHD_DIR}}/host_rsa_key
-# HostKey ${{SSHD_DIR}}/host_dsa_key
+HostKey <%= SSHD_DIR %>/host_rsa_key
+# HostKey <%= SSHD_DIR %>/host_dsa_key
 
 # Lifetime and size of ephemeral version 1 server key
 #KeyRegenerationInterval 1h
@@ -121,7 +47,7 @@ SyslogFacility AUTHPRIV
 #RSAAuthentication yes
 #PubkeyAuthentication yes
 #AuthorizedKeysFile	.ssh/authorized_keys
-AuthorizedKeysFile	${{SSHD_DIR}}/authorized_keys
+AuthorizedKeysFile	<%= SSHD_DIR %>/authorized_keys
 
 # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
 #RhostsRSAAuthentication no
@@ -185,7 +111,7 @@ GatewayPorts yes
 #ClientAliveInterval 0
 #ClientAliveCountMax 3
 #UseDNS yes
-PidFile ${{PID_FILE}}
+PidFile <%= SSHD_DIR %>/sshd.pid
 #MaxStartups 10
 #PermitTunnel no
 #ChrootDirectory none
