@@ -9,8 +9,7 @@ class Controllers::Info < Controllers::Base
       api: "pipe2me #{VERSION}",
       version: VERSION,
       domain: DOMAIN,
-      ports: PORTS,
-      ports_per_subdomain: PORTS_PER_SUBDOMAIN
+      ports: PORTS
     )
   end
 end

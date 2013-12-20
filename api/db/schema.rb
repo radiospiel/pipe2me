@@ -10,20 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2) do
+ActiveRecord::Schema.define(version: 1) do
 
-  create_table "subdomains", force: true do |t|
-    t.string   "endpoint"
-    t.string   "name"
-    t.string   "scheme",              default: "http"
+  create_table "subdomain_ports", force: true do |t|
     t.integer  "port"
-    t.text     "ssh_public_key"
-    t.text     "ssh_private_key"
+    t.integer  "subdomain_id"
+    t.string   "protocol",     default: "tcp"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "openssl_certificate"
   end
 
-  add_index "subdomains", ["port"], name: "index_subdomains_on_port"
+  add_index "subdomain_ports", ["port"], name: "index_subdomain_ports_on_port", unique: true
+  add_index "subdomain_ports", ["subdomain_id"], name: "index_subdomain_ports_on_subdomain_id"
+
+  create_table "subdomains", force: true do |t|
+    t.string   "token"
+    t.string   "endpoint"
+    t.string   "fqdn"
+    t.text     "ssh_public_key"
+    t.text     "ssh_private_key"
+    t.text     "openssl_certificate"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

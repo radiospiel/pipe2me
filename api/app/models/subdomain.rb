@@ -1,96 +1,85 @@
-require "wordize"
-require "ssh"
+# require "wordize"
+# require "ssh"
 
+#
+# A Subdomain object models a single subdomain registration. Each subdomain
+# manages a number of ports. These ports are assigned by the server in the
+# PORTS range. Subdomain manages a number of tunnels on different ports.
+#
+# The request for a subdomain contains a number of services, like http,
+# https, etc. These service settings are used to determine whether the
+# service running on the machine tunnelled to is alive, and whether all
+# services are accessible directly - which allows to redirect traffic to
+# that machine via DNS. These settings are returned by the *ports* attribute.
+#
+# The subdomain has openssh identity tokens in *ssh_public_key* and
+# *ssh_private_key*, which can be used to establish the tunnels via OpenSSH,
+# and an OpenSSL certificate in *openssl_certificate*.
+
+# Other attributes:
+#
+# - a subdomain is identified by a *token* - a randomly generated string.
+# - a subdomain has a *fqdn*
+# - a subdomain has a tunnel *endpoint*. This is the hostname which offers
+#   the publicly available ports for the services.
+# - a subdomain has ssl identity tokens in *ssh_public_key* and *ssh_private_key*.
+# - a subdomain has an *openssl_certificate*, which  ssl identity tokens in *ssh_public_key* and *ssh_private_key*.
+
+#
 class Subdomain < ActiveRecord::Base
-  # A subdomain has these attributes:
-  #
-  # An auth token for this subdomain
-  # t.string  :token
-  #
-  # The full name of the subdomain, e.g. "pink-pony.pipe2.me".
-  # t.string  :name
-  #
-  # The hostname of the subdomain's endpoint. A typical endpoint might be
-  # "eu.pipe2.me". The endpoint will be used as the CNAME for DNS based
-  # redirection to the tunnel, if the start point is not publicly accessible.
-  #
-  # t.string :endpoint
-  #
-  # The scheme of the subdomain at port :port. This can be http
-  # or https, and is used to verify whether a client is accessible.
-  # t.string  :scheme, default: "http"
-  #
-  # The first port number of the subdomain
-  # t.integer :port
-  #
-  # The private and public SSH key
-  # t.text    :ssh_public_key
-  # t.text    :ssh_private_key
-
   # -- name and port are readonly, once chosen, and are set automatically -----
 
-  attr_readonly :name, :port
+  attr_readonly :fqdn, :protocols
 
-  validates_presence_of   :name, :on => :create
-  validates_uniqueness_of :name, :on => :create
-
-  validates_inclusion_of  :port, :on => :create, :in => PORTS
-  validates_uniqueness_of :port, :on => :create
+  validates_uniqueness_of :fqdn, :on => :create
+  validates_presence_of   :fqdn, :on => :create
 
   # -- the target host --------------------------------------------------------
 
   # This is the tunnel target hostname. This entry is useful to define
   # different tunnel targets based on some criteria, e.g. the region.
 
-  # The scheme for the target host.
-  validates_inclusion_of  :scheme, :in => %w(http https tcp)
-
   # -- set default values -----------------------------------------------------
 
   before_validation :initialize_defaults
 
   def initialize_defaults
-    require_relative "subdomain/builder"
+    require_relative "subdomain/fqdn"
 
-    self.id ||= SecureRandom.random_number(1 << 63)
-    self.port = Builder.choose_port unless port?
-    self.name = Builder.choose_name unless name?
+    self.token = SecureRandom.random_number(1 << 128).to_s(36) unless token?
+    self.fqdn = FQDN.choose unless fqdn?
   end
 
-  # -- find by token or raise RecordNotFound. ---------------------------------
+  # -- ports ------------------------------------------------------------------
 
-  def token
-    id.to_s
-  end
+  require_relative "subdomain/port"
 
-  def self.find_by_token(token)
-    find Integer(token)
-  end
+  attr :protocols, true
 
-  # -- SSH keys ---------------------------------------------------------------
+  has_many :ports, :class_name => "::Subdomain::Port"
+  before_create :assign_ports
 
-  # generate and save ssh keys if missing.
-  def ssh_keygen!
-    return if has_ssh_key?
+  # The protocols attribute contains a list of protocols.
+  def assign_ports
+    protocols = self.protocols || []
+    return if protocols.empty?
 
-    ssh_public_key, ssh_private_key = SSH.keygen(name)
-    update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
-  end
+    Port.reserve! protocols.count
 
-  # does this record has ssh keys?
-  def has_ssh_key?
-    ssh_public_key.present? && ssh_private_key.present?
+    protocols.each do |protocol|
+      port = Port.unused.first
+      raise "Cannot reserve port for '#{protocol}' protocol" unless port
+      port.update_attributes! protocol: protocol
+      self.ports << port
+    end
   end
 
   # -- dynamic attributes -----------------------------------------------------
 
-  def url(options = {})
-    port = options[:port] || self.port
-    "#{scheme}://#{name}:#{port}"
-  end
-
-  def ports
-    (port .. (port + PORTS_PER_SUBDOMAIN - 1)).to_a
+  def urls(protocol = nil)
+    ports = self.ports
+    ports = ports.where(protocol: protocol) if protocol
+    ports.map(&:url)
   end
 
   # The private tunnel URL. This is where the client connects to, usually via
@@ -105,8 +94,23 @@ class Subdomain < ActiveRecord::Base
   def openssl_certgen!
     return if openssl_certificate?
 
-    Sys.sys! "#{ROOT}/ca/mk-certificate", name
-    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{name}.pem"
+    Sys.sys! "#{ROOT}/ca/mk-certificate", fqdn
+    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{fqdn}.pem"
     update_attributes! :openssl_certificate => openssl_certificate
+  end
+
+  # -- SSH keys ---------------------------------------------------------------
+
+  # generate and save ssh keys if missing.
+  def ssh_keygen!
+    return if has_ssh_key?
+
+    ssh_public_key, ssh_private_key = SSH.keygen(fqdn)
+    update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
+  end
+
+  # does this record has ssh keys?
+  def has_ssh_key?
+    ssh_public_key.present? && ssh_private_key.present?
   end
 end
