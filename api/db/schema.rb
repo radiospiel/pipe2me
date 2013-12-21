@@ -34,4 +34,6 @@ ActiveRecord::Schema.define(version: 1) do
     t.datetime "updated_at"
   end
 
+  add_index "subdomains", ["fqdn"], name: "index_subdomains_on_fqdn", unique: true
+
 end

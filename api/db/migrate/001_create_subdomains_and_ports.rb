@@ -18,6 +18,8 @@ class CreateSubdomainsAndPorts < ActiveRecord::Migration
       t.text    :openssl_certificate
 
       t.timestamps
+
+      t.index :fqdn, unique: true
     end
 
     create_table :subdomain_ports do |t|
