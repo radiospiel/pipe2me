@@ -186,7 +186,19 @@ module HTTP
 
     request = verb.new(uri.request_uri)
 
-    request.body = body if verb.const_get "REQUEST_HAS_BODY"
+    if verb.const_get "REQUEST_HAS_BODY"
+      case body
+      when String
+        request.body = body
+      when Hash
+        request.form_data = body
+      when nil
+      else
+        raise ArgumentError, "Unsupported body of class #{body.class.name}"
+      end
+    end
+
+
     request.basic_auth(r.user, r.password) if uri.user && uri.password
     response = http.request(request)
 
