@@ -19,9 +19,8 @@ class Subdomain::Redirection
     Subdomain.where(fqdn: host).first
   end
 
-  # build redirection target URL. Note that the scheme might be different
-  # from http and https, in which case this method returns a target URL,
-  # that might be invalid for most http clients.
+  # build redirection target URL. Note that redirection is not possible
+  # if the subdomain does not provide a https or http scheme.
   def self.url_for(request)
     # lookup subdomain.
     host, path_info, query_string = request.host, request.path_info, request.query_string
