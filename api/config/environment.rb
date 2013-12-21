@@ -37,6 +37,7 @@ PORTS_PER_SUBDOMAIN = Integer(ENV["TUNNEL_PORTS_PER_SUBDOMAIN"] || 1)
 STDERR.puts "Starting app in #{ROOT}"
 
 $: << "#{ROOT}/app"
+$: << "#{ROOT}/app/models"
 $: << "#{ROOT}/lib"
 
 RACK_ENV = ENV["RACK_ENV"] || "development"
