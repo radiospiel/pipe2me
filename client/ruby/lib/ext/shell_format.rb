@@ -18,7 +18,7 @@ module ShellFormat
       value = Integer(value) rescue value
 
       if key =~ /^([^_]+)_(\d+)$/
-        ary = arrays[$1] || []
+        ary = arrays[$1] ||= []
         ary[$2.to_i] = value
         key, value = $1, ary
       end
