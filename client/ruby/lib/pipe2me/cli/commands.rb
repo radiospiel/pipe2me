@@ -47,22 +47,23 @@ module Pipe2me::CLI
   banner "fetch a new tunnel setup"
   option :server, "Use pipe2.me server on that host", :default => "https://pipe2.me:5000"
   option :auth, "pipe2.me auth token",  :type => String, :required => true
-  option :port, "localhost port number", :type => Integer
+  option :protocols, "protocol names, e.g. 'http,https,imap'", :type => String, :default => "https"
+  option :local_ports, "local ports, one per protocol", :type => String
   def setup
     Pipe2me::Config.server = options[:server]
 
     # [todo] escape auth option
-    response = HTTP.post! "#{Pipe2me::Config.server}/subdomains/#{options[:auth]}", ""
+    response = HTTP.post! "#{Pipe2me::Config.server}/subdomains/#{options[:auth]}",
+      "protocols" => options[:protocols]
 
     server_info = ShellFormat.parse(response)
 
-    server_uri = URI.parse server_info[:url]
-    name = Pipe2me::Config.install_tunnel server_info,
-      server:     Pipe2me::Config.server,
-      local_port: (options[:port] || server_uri.port)
+    Pipe2me::Config.install_tunnel server_info,
+      server:       Pipe2me::Config.server,
+      local_ports:  options[:local_ports]
 
-    update name
-    puts name
+    update server_info[:fqdn]
+    puts server_info[:fqdn]
   end
 
   banner "Start tunnels"

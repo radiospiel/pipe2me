@@ -82,7 +82,7 @@ module Pipe2me::Config
     info = tunnel(name)
 
     remote_base = "#{info[:server]}/subdomains/#{info[:token]}"
-    local_base = path("tunnels/#{info[:name]}")
+    local_base = path("tunnels/#{info[:fqdn]}")
 
     url = "#{remote_base}/#{asset}"
     path  = "#{local_base}/#{asset}"
@@ -100,7 +100,7 @@ module Pipe2me::Config
   public
 
   def install_tunnel(server_info, local_info)
-    name = server_info[:name] || raise(ArgumentError, "Missing :name information")
+    name = server_info[:fqdn] || raise(ArgumentError, "Missing :fqdn information")
 
     path = self.path("tunnels/#{name}")
     File.atomic_write File.join(path, "info.inc"), ShellFormat.dump(server_info)

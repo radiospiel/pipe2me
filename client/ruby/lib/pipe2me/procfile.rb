@@ -9,11 +9,11 @@ module Pipe2me::Procfile
   def write(tunnels)
     procfile = ""
 
-    tunnels.each do |name|
+    tunnels.each do |fqdn|
       idx = 0
-      commands_for(name) do |cmd|
+      commands_for(fqdn) do |cmd|
         idx += 1
-        procfile << "#{name.split(".", 2).first}-#{idx}: #{cmd.join(" ")}\n"
+        procfile << "#{fqdn.split(".", 2).first}-#{idx}: #{cmd.join(" ")}\n"
       end
     end
 
@@ -31,27 +31,27 @@ module Pipe2me::Procfile
   def commands_for(name)
     info = Pipe2me::Config.tunnel(name)
 
-    name, ports, tunnel = info.values_at :name, :ports, :tunnel
-    tunnel_uri = URI.parse(tunnel)
-
     # verify, and, if needed, fix id_rsa mod (too prevent (some) ssh's
     # from complaining
-    id_rsa = File.join Pipe2me::Config.path("tunnels"), name, "id_rsa"
+    id_rsa = File.join Pipe2me::Config.path("tunnels"), info[:fqdn], "id_rsa"
     FileUtils.chmod 0600, id_rsa
 
-    # create a command for each port
-    first_port, local_port = info.values_at :port, :local_port
-    local_port ||= first_port
+    tunnel, urls, local_ports = info.values_at :tunnel, :urls, :local_ports
+    tunnel_uri = URI.parse(tunnel)
 
-    ports.each_with_index do |port, idx|
-      UI.info "Forwarding #{tunnel_uri.host}:#{port} => localhost:#{local_port + port - first_port}"
+    # create a command for each port
+    urls.zip((local_ports || "").split(",").each do |url, local_port|
+      port = URI.parse(url).port
+      local_port ||= port
+      UI.info "Forwarding #{tunnel_uri.host}:#{port} => localhost:#{local_port}"
+
       yield [
         "env", "AUTOSSH_GATETIME=0",
         autossh,
         "-M 0",
         "#{tunnel_uri.user}@#{tunnel_uri.host}",
         "-p #{tunnel_uri.port}",
-        "-R 0.0.0.0:#{port}:localhost:#{local_port + port - first_port}",
+        "-R 0.0.0.0:#{port}:localhost:#{local_port}",
         "-i #{id_rsa}",
         "-o StrictHostKeyChecking=no",
         "-N"
@@ -61,10 +61,10 @@ module Pipe2me::Procfile
       # we need the server to listen on identical ports. If the local port is
       # different from the remote port, we also install another local port
       # forwarder.
-      next if port == local_port + port - first_port
+      next if local_port == port
       next if %w(localhost 127.0.0.1).include? tunnel_uri.host
 
-      UI.info "Forwarding localhost:#{port} => localhost:#{local_port + port - first_port}"
+      UI.info "Forwarding localhost:#{port} => localhost:#{local_port}"
 
       # Note that we don't use iptables here, but socat.
       # see http://superuser.com/questions/425694/duplicate-reroute-port-to-another-port
