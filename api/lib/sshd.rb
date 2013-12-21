@@ -73,7 +73,7 @@ module SSHD
     return unless subdomain.ssh_public_key?
 
     options = AUTHORIZED_KEYS_OPTIONS.grep(/^[^#]/)
-    options += subdomain.ports.map { |port|  "permitopen=\":#{port}\"" }
+    options += subdomain.ports.map { |port|  "permitopen=\":#{port.port}\"" }
 
     "#{options.join(",")} #{subdomain.ssh_public_key}"
   end
