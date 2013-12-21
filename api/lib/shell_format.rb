@@ -4,6 +4,7 @@ module ShellFormat
   extend self
 
   def shell(obj, prefix=nil)
+    content_type :text
     format_entries([], obj, prefix).join
   end
 

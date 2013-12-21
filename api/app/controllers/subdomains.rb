@@ -7,6 +7,10 @@ class Controllers::Subdomains < Controllers::Base
   helpers ::ShellFormat
   helpers Sinatra::JSON
 
+  before do
+    content_type :text
+  end
+
   # -- index: get all subdomains ----------------------------------------------
 
   get "/" do
@@ -25,7 +29,8 @@ class Controllers::Subdomains < Controllers::Base
   # -- create: create a new subdomain -----------------------------------------
 
   post "/:auth" do
-    subdomain = Subdomain.create!
+    protocols = params[:protocols] || "http"
+    subdomain = Subdomain.create! protocols: protocols.split(",")
     shell public_attributes(subdomain)
   end
 
@@ -33,40 +38,36 @@ class Controllers::Subdomains < Controllers::Base
 
   # return the token configuration
   get "/:token" do
-    subdomain = Subdomain.find_by_token(params[:token])
     shell public_attributes(subdomain)
   end
 
   get "/:token/id_rsa" do
-    subdomain = Subdomain.find_by_token(params[:token])
-    content_type :text
     subdomain.ssh_keygen!
     subdomain.ssh_private_key
   end
 
   get "/:token/id_rsa.pub" do
-    subdomain = Subdomain.find_by_token(params[:token])
-    content_type :text
     subdomain.ssh_keygen!
     subdomain.ssh_public_key
   end
 
   get "/:token/cert.pem" do
-    subdomain = Subdomain.find_by_token(params[:token])
-    content_type :text
     subdomain.openssl_certgen!
     subdomain.openssl_certificate
   end
 
   private
 
+  def subdomain
+    @subdomain ||= (params[:token] && Subdomain.where(token: params[:token]).first) ||
+      Subdomain.find(params[:token])
+  end
+
   def public_attributes(subdomain)
     {
       token:            subdomain.token,
-      ports:            subdomain.ports,
-      port:             subdomain.port,
-      name:             subdomain.name,
-      url:              subdomain.url,
+      fqdn:             subdomain.fqdn,
+      urls:             subdomain.urls,
       tunnel:           subdomain.tunnel_private_url
     }
   end

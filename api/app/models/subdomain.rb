@@ -53,8 +53,13 @@ class Subdomain < ActiveRecord::Base
 
   attr :protocols, true
 
-  has_many :ports, :class_name => "::Subdomain::Port"
-  before_create :assign_ports
+  has_many :ports, :class_name => "::Subdomain::Port", :dependent => :destroy
+
+  # Note: assign_ports must be run after the subdomain is created! Otherwise
+  # when a newly assigned ports gets assigned to this subdomain it gets not
+  # marked as assigned (by setting its subdomain_id) and will be reassigned
+  # for the next protocol.
+  after_create :assign_ports
 
   # The protocols attribute contains a list of protocols.
   def assign_ports
@@ -110,5 +115,25 @@ class Subdomain < ActiveRecord::Base
     ssh_public_key, ssh_private_key = SSHD.keygen(fqdn)
     update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
     SSHD.write_authorized_keys
+  end
+end
+
+module Subdomain::Etest
+  def subdomain(options = {})
+    subdomain = Subdomain.create! options
+    Subdomain.find(subdomain.id)
+  end
+
+  def test_single_protocol
+    subdomain = self.subdomain protocols: %w(http)
+    assert_equal(subdomain.ports.count, 1)
+  end
+
+  def test_multiple_protocols
+    subdomain = self.subdomain protocols: %w(http https)
+    assert_equal(subdomain.ports.count, 2)
+
+    url_protocols = subdomain.urls.map { |url| URI.parse(url).scheme }
+    assert_equal(url_protocols, %w(http https) )
   end
 end

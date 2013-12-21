@@ -1,7 +1,7 @@
 class Subdomain::Port < ActiveRecord::Base
   belongs_to :subdomain
 
-  validates_inclusion_of  :protocol, :in => %w(http https tcp)
+  validates_inclusion_of  :protocol, :in => %w(http https imap smtp tcp)
 
   scope :unused, -> { where(subdomain_id: nil) }
 
@@ -9,7 +9,7 @@ class Subdomain::Port < ActiveRecord::Base
     return if unused.count >= n
 
     transaction do
-      existing_ports = select("port").all.map(&:port)
+      existing_ports = select("port").map(&:port)
       potential_ports = (PORTS.to_a - existing_ports)
 
       potential_ports.first(3 * n).each do |port|
