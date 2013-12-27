@@ -40,7 +40,7 @@ module Pipe2me::Procfile
     tunnel_uri = URI.parse(tunnel)
 
     # create a command for each port
-    urls.zip((local_ports || "").split(",").each do |url, local_port|
+    urls.zip((local_ports || "").split(",")).each do |url, local_port|
       port = URI.parse(url).port
       local_port ||= port
       UI.info "Forwarding #{tunnel_uri.host}:#{port} => localhost:#{local_port}"
@@ -62,7 +62,7 @@ module Pipe2me::Procfile
       # different from the remote port, we also install another local port
       # forwarder.
       next if local_port == port
-      next if %w(localhost 127.0.0.1).include? tunnel_uri.host
+      next if %w(localhost 127.0.0.1).include?(tunnel_uri.host)
 
       UI.info "Forwarding localhost:#{port} => localhost:#{local_port}"
 
