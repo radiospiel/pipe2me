@@ -1,3 +1,5 @@
+require "sys"
+
 #
 # A Subdomain object models a single subdomain registration. Each subdomain
 # manages a number of ports. These ports are assigned by the server in the
@@ -99,6 +101,21 @@ class Subdomain < ActiveRecord::Base
     Sys.sys! "#{ROOT}/ca/mk-certificate", fqdn
     openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{fqdn}.pem"
     update_attributes! :openssl_certificate => openssl_certificate
+  end
+
+  def openssl_sign_certificate!(csr)
+    tmpfile = Tempfile.new("#{fqdn}.csr")
+    tmpfile.write csr
+    tmpfile.close
+
+    Sys.sys! "#{ROOT}/ca/sign-certificate", fqdn, tmpfile.path
+    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{fqdn}.pem"
+    update_attributes! :openssl_certificate => openssl_certificate
+
+    tmpfile.unlink                            # deletes the temp file
+  rescue
+    tmpfile.close! rescue nil                 # close and deletes the temp file
+    raise
   end
 
   # -- SSH keys ---------------------------------------------------------------

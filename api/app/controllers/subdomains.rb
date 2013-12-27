@@ -52,7 +52,13 @@ class Controllers::Subdomains < Controllers::Base
   end
 
   get "/:token/cert.pem" do
-    subdomain.openssl_certgen!
+    # subdomain.openssl_certgen!
+    subdomain.openssl_certificate
+  end
+
+  post "/:token/cert.pem" do
+    csr = request.body.read.to_s
+    subdomain.openssl_sign_certificate! csr
     subdomain.openssl_certificate
   end
 
