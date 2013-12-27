@@ -81,13 +81,65 @@ module Pipe2me::Config
   def tunnel_download(name, asset)
     info = tunnel(name)
 
-    remote_base = "#{info[:server]}/subdomains/#{info[:token]}"
-    local_base = path("tunnels/#{info[:fqdn]}")
+    remote_basedir = "#{info[:server]}/subdomains/#{info[:token]}"
+    local_basedir = path("tunnels/#{info[:fqdn]}")
 
-    url = "#{remote_base}/#{asset}"
-    path  = "#{local_base}/#{asset}"
-    UI.debug "#{url} => #{path}"
+    url = "#{remote_basedir}/#{asset}"
+    path  = "#{local_basedir}/#{asset}"
+
     File.atomic_write path, HTTP.get!(url)
+  end
+
+  def install_file(src, dest)
+    return if File.exists?(dest) && File.mtime(src) <= File.mtime(dest)
+
+    FileUtils.mkdir_p File.dirname(dest)
+
+    FileUtils.cp src, dest
+    UI.info "Copied #{src} -> #{dest}"
+  end
+
+  def tunnel_download_certificate(name)
+    info = tunnel(name)
+
+    fqdn = info[:fqdn]
+
+    # -- make sure the openssl subdir exists ----------------------------------
+
+    Pipe2me::Config.path("openssl")
+    openssl_conf  = File.join(Pipe2me::Config.path("openssl"), "openssl.conf")
+    install_file File.join(File.dirname(__FILE__), "openssl.conf"), openssl_conf
+
+    # -- paths ----------------------------------------------------------------
+
+    remote_basedir = "#{info[:server]}/subdomains/#{info[:token]}"
+    local_basedir = path("tunnels/#{info[:fqdn]}")
+
+    privkey_path = "#{local_basedir}/openssl.privkey.pem"
+    csr_path = "#{local_basedir}/openssl.csr"
+    cert_path = "#{local_basedir}/openssl.pem"
+
+    # -- create privkey and CSR -----------------------------------------------
+
+    unless File.exists?(privkey_path) && File.exists?(csr_path)
+      Sys.sys! "openssl",
+        "req", "-config", openssl_conf,
+        "-new", "-nodes",
+        "-keyout", "#{local_basedir}/openssl.privkey.pem",
+        "-out", "#{local_basedir}/openssl.csr",
+        "-subj", "/C=de/ST=ne/L=Berlin/O=kinko/CN=#{fqdn}",
+        "-days", "7300"
+    end
+
+    # -- send CSR to server and receive certificate ---------------------------
+
+    unless false && File.exists?(cert_path)
+      url = "#{remote_basedir}/openssl.pem"
+      certificate = HTTP.post!("#{remote_basedir}/cert.pem", File.read(csr_path), {'Content-Type' =>'text/plain'})
+      UI.info "received certificate:\n#{certificate}"
+
+      File.atomic_write cert_path, certificate
+    end
   end
 
   private

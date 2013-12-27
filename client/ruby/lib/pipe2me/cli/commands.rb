@@ -38,7 +38,7 @@ module Pipe2me::CLI
     Pipe2me::Config.tunnels(*args).each do |name|
       Pipe2me::Config.tunnel_download name, "id_rsa"
       Pipe2me::Config.tunnel_download name, "id_rsa.pub"
-      Pipe2me::Config.tunnel_download name, "cert.pem"
+      Pipe2me::Config.tunnel_download_certificate name
 
       UI.info "Updating", name
     end
