@@ -166,6 +166,9 @@ module HTTP
     UI.benchmark :info, "[#{verb.name.gsub(/.*::/, "").upcase}] #{uri}" do
       do_raw_request verb, uri, headers, body, config.max_redirections, uri, Net::HTTP::Get
     end
+
+  rescue
+    raise "#{uri}: #{$!}"
   end
 
   def do_raw_request(verb, uri, headers, body, max_redirections, original_url, redirection_verb = Net::HTTP::Get)
@@ -185,6 +188,7 @@ module HTTP
     # create request and get response
 
     request = verb.new(uri.request_uri)
+    request.initialize_http_header headers
 
     if verb.const_get "REQUEST_HAS_BODY"
       case body
