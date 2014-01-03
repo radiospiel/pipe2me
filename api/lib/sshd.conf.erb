@@ -15,7 +15,7 @@
 
 #Port 22
 #AddressFamily any
-ListenAddress <%= SSHD_LISTEN_ADDRESS %>
+ListenAddress <%= listen_address %>
 #ListenAddress ::
 
 # The default requires explicit activation of protocol 1
@@ -24,8 +24,7 @@ ListenAddress <%= SSHD_LISTEN_ADDRESS %>
 # HostKey for protocol version 1
 #HostKey /etc/ssh/ssh_host_key
 # HostKeys for protocol version 2
-HostKey <%= SSHD_DIR %>/host_rsa_key
-# HostKey <%= SSHD_DIR %>/host_dsa_key
+HostKey <%= path(:host_key) %>
 
 # Lifetime and size of ephemeral version 1 server key
 #KeyRegenerationInterval 1h
@@ -47,7 +46,7 @@ SyslogFacility AUTHPRIV
 #RSAAuthentication yes
 #PubkeyAuthentication yes
 #AuthorizedKeysFile	.ssh/authorized_keys
-AuthorizedKeysFile	<%= SSHD_DIR %>/authorized_keys
+AuthorizedKeysFile	<%= path(:authorized_keys) %>
 
 # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
 #RhostsRSAAuthentication no
@@ -111,7 +110,7 @@ GatewayPorts yes
 #ClientAliveInterval 0
 #ClientAliveCountMax 3
 #UseDNS yes
-PidFile <%= SSHD_DIR %>/sshd.pid
+PidFile <%= path("sshd.pid") %>
 #MaxStartups 10
 #PermitTunnel no
 #ChrootDirectory none

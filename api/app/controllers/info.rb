@@ -8,8 +8,8 @@ class Controllers::Info < Controllers::Base
     render(
       api: "pipe2me #{VERSION}",
       version: VERSION,
-      domain: DOMAIN,
-      ports: PORTS
+      domain: TUNNEL_DOMAIN,
+      ports: TUNNEL_PORTS
     )
   end
 end

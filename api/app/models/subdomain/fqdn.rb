@@ -18,6 +18,6 @@ module Subdomain::FQDN
   end
 
   def self.generate
-    Wordize.wordize(rand(100000)) + ".#{DOMAIN}"
+    Wordize.wordize(rand(100000)) + ".#{TUNNEL_DOMAIN}"
   end
 end

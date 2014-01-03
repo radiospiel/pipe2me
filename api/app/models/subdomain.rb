@@ -3,7 +3,7 @@ require "sys"
 #
 # A Subdomain object models a single subdomain registration. Each subdomain
 # manages a number of ports. These ports are assigned by the server in the
-# PORTS range. Subdomain manages a number of tunnels on different ports.
+# TUNNEL_PORTS range. Subdomain manages a number of tunnels on different ports.
 #
 # The request for a subdomain contains a number of services, like http,
 # https, etc. These service settings are used to determine whether the
@@ -90,7 +90,7 @@ class Subdomain < ActiveRecord::Base
   # autossh, to start the tunnel(s).
 
   def tunnel_private_url
-    "ssh://#{TUNNEL_USER}@#{SSHD_LISTEN_ADDRESS}"
+    "ssh://#{SSHD.user}@#{SSHD.listen_address}"
   end
 
   # -- OpenSSL cerificate -----------------------------------------------------

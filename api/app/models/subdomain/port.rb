@@ -10,7 +10,7 @@ class Subdomain::Port < ActiveRecord::Base
 
     transaction do
       existing_ports = select("port").map(&:port)
-      potential_ports = (PORTS.to_a - existing_ports)
+      potential_ports = (TUNNEL_PORTS.to_a - existing_ports)
 
       potential_ports.first(3 * n).each do |port|
         create(port:port)
