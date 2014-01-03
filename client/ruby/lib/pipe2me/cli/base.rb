@@ -69,6 +69,7 @@ module Pipe2me::CLI
 
       self.banner "Options include:\n "
 
+      opt :config, "Path to config directory", :default => "~/.pipe2me"
       opt :verbose, "Be verbose"
       opt :quiet, "Be quiet"
       opt :silent, "Be silent"
@@ -77,6 +78,10 @@ module Pipe2me::CLI
 
       stop_on SELF.command_names
     end
+
+    # -- evaluate global options ----------------------------------------------
+
+    Pipe2me::Config.path = options[:config]
 
     # -- determine UI verbosity -----------------------------------------------
 

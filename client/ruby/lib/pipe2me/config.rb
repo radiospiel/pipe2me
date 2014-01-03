@@ -6,14 +6,14 @@ module Pipe2me::Config
   DEFAULT_PATH = if `whoami`.chomp == "root"
     "/etc/pipe2me"
   else
-    File.expand_path("~/.pipe2me")
+    "~/.pipe2me"
   end
 
   attr :path, true
 
   # Returns a path inside the pipe2me config directory.
   def path(*components)
-    path = @path || DEFAULT_PATH
+    path = File.expand_path(@path || DEFAULT_PATH)
     path = File.join(path, *components)
     FileUtils.mkdir_p path unless File.exist?(path)
     path
