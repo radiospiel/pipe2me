@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+require 'socket'
+
+HERE = File.expand_path File.dirname(__FILE__)
+
+# == start test server ========================================================
+
+child_pid = fork do
+  Dir.chdir "#{HERE}/../api" do
+    ENV["RACK_ENV"] = "test"
+
+    system "rake db:migrate 2>&1 >> #{HERE}/logs/server.log"
+    exec "foreman start -p 4000 -d #{HERE}/../api 2>&1 >> #{HERE}/logs/server.log" 
+  end
+end
+
+# == waiting for test server start ============================================
+
+print "waiting for start up\t"
+while true do
+  begin
+    s = TCPSocket.open("localhost", 4000)
+    s.close
+    break
+  rescue
+    # Errno::ECONNREFUSED
+    Thread.send :sleep, 0.05
+  end
+  print "."
+end
+puts ""
+
+# == run ruby tests ===========================================================
+
+system "ruby #{HERE}/runner.rb"
+
+# == shutdown test server =====================================================
+
+puts "killing test server #{child_pid}"
+Process.kill "TERM", child_pid
+puts "waiting for test server to finish #{child_pid}"
+Process.wait child_pid
+system "killall sshd"
