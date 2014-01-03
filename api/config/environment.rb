@@ -20,8 +20,11 @@ TUNNEL_PORTS = $1.to_i ... $2.to_i
 ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
 RACK_ENV = ENV["RACK_ENV"] || "development"
 
-VAR=File.join "#{ROOT}/var"
-VAR=File.join "#{ROOT}/var-test" if RACK_ENV == "test"
+if RACK_ENV == "test"
+  VAR=File.join "#{ROOT}/var-test"
+else
+  VAR=File.join "#{ROOT}/var"
+end
 
 $: << "#{ROOT}/app"
 $: << "#{ROOT}/app/models"
