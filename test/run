@@ -1,17 +1,24 @@
 #!/usr/bin/env ruby
 require 'socket'
+require 'fileutils'
 
 HERE = File.expand_path File.dirname(__FILE__)
+
+ENV["RACK_ENV"] = "test"
+
+# == prepare test area ========================================================
+
+FileUtils.rm_rf "#{HERE}/../api/var-test/"
+FileUtils.rm_rf "#{HERE}/pipe2me-config/"
+
+Dir.chdir "#{HERE}/../api" do
+  system "rake db:migrate 2>&1 >> #{HERE}/logs/server.log"
+end
 
 # == start test server ========================================================
 
 child_pid = fork do
-  Dir.chdir "#{HERE}/../api" do
-    ENV["RACK_ENV"] = "test"
-
-    system "rake db:migrate 2>&1 >> #{HERE}/logs/server.log"
-    exec "foreman start -p 4000 -d #{HERE}/../api 2>&1 >> #{HERE}/logs/server.log" 
-  end
+  exec "foreman start -p 4000 -d #{HERE}/../api 2>&1 >> #{HERE}/logs/server.log" 
 end
 
 # == waiting for test server start ============================================
