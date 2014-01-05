@@ -70,6 +70,15 @@ module Pipe2me::CLI
   def start
     Pipe2me::Procfile.write Pipe2me::Config.tunnels
     Dir.chdir Pipe2me::Config.path
+    UI.debug "chdir into", Pipe2me::Config.path
+    Kernel.exec "./pipe2me-runner"
+  end
+
+  banner "Start all tunnels and test servers"
+  def test
+    Pipe2me::Procfile.write Pipe2me::Config.tunnels, test: true
+    Dir.chdir Pipe2me::Config.path
+    UI.debug "chdir into", Pipe2me::Config.path
     Kernel.exec "./pipe2me-runner"
   end
 

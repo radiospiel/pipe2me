@@ -72,10 +72,16 @@ module Pipe2me::Config
   # returns an info hash about a specific tunnel.
   def tunnel(name)
     raise ArgumentError, "Missing name" unless name
-    tunnel_info = parse_info path("tunnels/#{name}"), "info.inc"
-    local_info = parse_info path("tunnels/#{name}"), "local.inc"
 
-    tunnel_info.merge(local_info)
+    path = self.path("tunnels/#{name}")
+
+    info = { path: path }
+    info.merge! parse_info(path, "info.inc")
+    info.merge! parse_info(path, "local.inc")
+    if info[:local_ports]
+      info[:local_ports] = info[:local_ports].split(",")
+    end
+    info
   end
 
   def tunnel_download(name, asset)
@@ -136,7 +142,7 @@ module Pipe2me::Config
     unless false && File.exists?(cert_path)
       url = "#{remote_basedir}/openssl.pem"
       certificate = HTTP.post!("#{remote_basedir}/cert.pem", File.read(csr_path), {'Content-Type' =>'text/plain'})
-      UI.info "received certificate:\n#{certificate}"
+      UI.debug "received certificate:\n#{certificate}"
 
       File.atomic_write cert_path, certificate
     end

@@ -6,7 +6,7 @@ module Pipe2me::Procfile
     "#{Pipe2me::Config.path}/Procfile"
   end
 
-  def write(tunnels)
+  def write(tunnels, options = {})
     procfile = ""
 
     tunnels.each do |fqdn|
@@ -14,6 +14,14 @@ module Pipe2me::Procfile
       commands_for(fqdn) do |cmd|
         idx += 1
         procfile << "#{fqdn.split(".", 2).first}-#{idx}: #{cmd.join(" ")}\n"
+      end
+
+      next unless options[:test]
+
+      idx = 0
+      tests_for(fqdn) do |cmd|
+        idx += 1
+        procfile << "#{fqdn.split(".", 2).first}-echo-#{idx}: #{cmd.join(" ")}\n"
       end
     end
 
@@ -28,6 +36,29 @@ module Pipe2me::Procfile
 
   private
 
+  def tests_for(name)
+    info = Pipe2me::Config.tunnel(name)
+
+    # The client comes with a number of test servers, that more or less echo their input.
+    # They live in #{here}/echo.
+    here = File.dirname(__FILE__)
+
+    path, urls, local_ports = info.values_at :path, :urls, :local_ports
+    urls.zip(local_ports || []).each do |url, local_port|
+      uri = URI.parse(url)
+      local_port ||= uri.port
+
+      cmd = case uri.scheme
+      when "https"  then "env PORT=#{local_port} PIPE2ME_TUNNEL=#{path} SSL=1 #{here}/echo/http"
+      when "http"   then "env PORT=#{local_port} #{here}/echo/http"
+      else
+        UI.warn "No test server available for scheme", uri.scheme
+      end
+
+      yield [ cmd ] if cmd
+    end
+  end
+
   def commands_for(name)
     info = Pipe2me::Config.tunnel(name)
 
@@ -40,7 +71,7 @@ module Pipe2me::Procfile
     tunnel_uri = URI.parse(tunnel)
 
     # create a command for each port
-    urls.zip((local_ports || "").split(",")).each do |url, local_port|
+    urls.zip(local_ports || []).each do |url, local_port|
       port = URI.parse(url).port
       local_port ||= port
       UI.info "Forwarding #{tunnel_uri.host}:#{port} => localhost:#{local_port}"

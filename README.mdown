@@ -162,20 +162,89 @@ else, probably a client written in `{ba}sh`, but this is still the future.
 
 ### Configuring tunnels
 
-To configure one or more tunnels run this command:
+To configure one or more tunnels run `pipe2me setup`. For example, the following
+command will setup two tunnels, which will connect the outside world to local ports
+20102 and 20103. The command responds with the FQDN of the tunnels.
 
-    pipe2me setup \
-      --server server.name \
+    > pipe2me setup \
+      --server pipe2me.server.name \
       --auth this-is-your-auth-token \
-      --protocols http,https,imap \
-      --local-ports 20102,20103,20104 \
+      --protocols https,http \
+      --local-ports 20102,20103 \
+    handsome-lemon-panda.test.pipe2.me
 
-This reserves all resources for the requested tunnel on the server; including a
-single customized FQDN for these tunnels and a certificate for this FQDN.
-
-The *auth-token* is the "currency" for the pipe2me server. How to obtain an auth-token
+**Note:** The *auth-token* is the "currency" for the pipe2me server. How to obtain an auth-token
 is outside the scope of this document. However, each auth-token allows to create a
 single tunnel set with an upper limit on the number of tunnels.
+
+You cannot request specific ports for your tunnels - they will be assigned
+by the server. To find out more about your tunnels ask pipe2me
+
+    > ./bin/pipe2me list handsome-lemon-panda.test.pipe2.me
+    handsome-lemon-panda.test.pipe2.me
+      path: /Users/eno/.pipe2me/tunnels/handsome-lemon-panda.test.pipe2.me
+      ...
+      urls: ["https://handsome-lemon-panda.test.pipe2.me:10001", "http://handsome-lemon-panda.test.pipe2.me:10002" ]
+      ...
+
+If you need these settings in an own command you can also load these into the environment
+by running `. ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me`
+
+    ~/projects/pipe2me/client/ruby[master] > ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me
+    ...
+    URLS_0=https://handsome-lemon-panda.test.pipe2.me:10001
+    URLS_1=http://handsome-lemon-panda.test.pipe2.me:10002
+    SERVER=http://test.pipe2.me:5000
+    LOCAL_PORTS=20102,20103
+    ...
+
+## Testing tunnels
+
+The pipe2me client helps you testing its tunnels. For this it includes "echo"-servers for various
+protocols.
+
+Assuming you set up tunnels `handsome-lemon-panda.test.pipe2.me` as above. To run the tunnels in test
+mode you would run:
+
+    ~/projects/pipe2me/client/ruby[master] > ./bin/pipe2me test
+
+This starts all configured tunnels, and, where available, echo servers on the specified local ports.
+In other words: in our example the command above will run 2 connections to the tunnel server,
+and two echo servers on localhost on the ports 20102 and 20103.
+
+Use your browser or a command line http client to verify the local echo servers. On port 20103
+there should be a plain HTTP server running:
+
+    # verify http server on port 20103
+    ~ > curl http://localhost:20103/hello
+    GET /hello
+
+Port 20102 is configured to run a HTTPS server:
+
+    # verify https server on port 20102. Note: curl's -k option disables
+    # certificate verification.
+    ~ > curl -k https://localhost:20102/hello
+
+    # inspect the https server's certificate.
+    ~ > openssl s_client -connect localhost:20102 < /dev/null 2>/dev/null | openssl x509 -in /dev/stdin  -text | grep Subject.*CN
+            Subject: C=de, ST=ne, L=Berlin, O=kinko, CN=handsome-lemon-panda.test.pipe2.me
+
+Now verify that the tunnels are working:
+
+    # verify http server on port 10002
+    ~ > curl http://handsome-lemon-panda.test.pipe2.me:10002/hello
+    GET /hello
+
+This looks good. Now - what about the HTTPS server?
+
+    # verify http server on port 10001. curl's -k option again disables
+    # certificate verification.
+    ~ > curl -k https://handsome-lemon-panda.test.pipe2.me:10001/hello
+    GET /hello
+
+    # inspect the https server's certificate.
+    ~ > openssl s_client -connect handsome-lemon-panda.test.pipe2.me:10001 < /dev/null 2>/dev/null | openssl x509 -in /dev/stdin  -text | grep Subject.*CN
+            Subject: C=de, ST=ne, L=Berlin, O=kinko, CN=handsome-lemon-panda.test.pipe2.me
 
 # Start configured tunnels
 
