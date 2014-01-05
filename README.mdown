@@ -139,14 +139,14 @@ The *auth-token* is the "currency" for the pipe2me server. How to obtain an auth
 is outside the scope of this document. However, each auth-token allows to create a
 single tunnel set with an upper limit on the number of tunnels.
 
-## Open questions
-
-
 # Start configured tunnels
 
 ## Hacking pipe2me
 
 ### Running tests
+
+    cd test
+    ./run
 
 ### Contributing & Licensing
 
