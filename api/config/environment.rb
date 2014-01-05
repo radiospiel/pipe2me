@@ -1,5 +1,6 @@
 require 'dotenv'
 Dotenv.load
+Dotenv.load "~/pipe2me.server.conf"
 
 # The pipe2me version number.
 VERSION = "0.1.0"
@@ -12,7 +13,7 @@ VERSION = "0.1.0"
 TUNNEL_DOMAIN = ENV["TUNNEL_DOMAIN"] || "pipe2.dev"
 
 port_range = ENV["TUNNEL_PORT_RANGE"] || "10000...40000"
-raise ArgumentError, "Invalid TUNNEL_PORT_RANGE setting: #{port_range.inspect}" unless port_range =~ /^(\d+)...(\d+)$/
+raise ArgumentError, "Invalid TUNNEL_PORT_RANGE setting: #{port_range.inspect}" unless port_range =~ /^(\d+)\.\.\.(\d+)$/
 TUNNEL_PORTS = $1.to_i ... $2.to_i
 
 # -- path settings ------------------------------------------------------------
