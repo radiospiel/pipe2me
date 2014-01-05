@@ -24,6 +24,23 @@ module Pipe2me::CLI
     end
   end
 
+  banner "list all accessible tunnels"
+  def env(*args)
+    tunnels = Pipe2me::Config.tunnels(*args)
+
+    case tunnels.length
+    when 0  then raise "Could not find matching tunnels for #{args.map(&:inspect).join(", ")}"
+    when 1  then :nop
+    else
+      raise "Too many matching tunnels for #{args.map(&:inspect).join(", ")}"
+    end
+
+    tunnel = Pipe2me::Config.tunnel(tunnels.first)
+    path = tunnel[:path]
+    puts File.read("#{path}/local.inc")
+    puts File.read("#{path}/info.inc")
+  end
+
   banner "delete all stale tunnels"
   def clean(*args)
     Pipe2me::Config.configured_tunnels(*args).each do |name|
