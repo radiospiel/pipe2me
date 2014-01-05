@@ -70,7 +70,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  dotenv
   etest-unit
   foreman
   rack

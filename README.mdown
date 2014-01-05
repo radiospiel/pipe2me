@@ -45,6 +45,8 @@ other systems might or might not work. You have been warned!
 ### Configuring the server
 
 On startup the server reads its configuration from the file `~/pipe2me.server.conf`.
+Note that this is a ruby file.
+
 This file should contain the following settings:
 
 - `TUNNEL_DOMAIN`: set the server hostname: Each server serves connections for 
@@ -55,7 +57,7 @@ This file should contain the following settings:
   dnsimple.com; the DNS_SERVICE setting should be "dnsimple:<api_token>". See "Dynamic DNS Configuration"
   below.
 
-An example configuration can be found in `doc/pipe2me.server.conf.example`.
+An example configuration can be found in `api/doc/pipe2me.server.conf.example`.
   
 ### DNS Configuration
 

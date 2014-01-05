@@ -1,26 +1,21 @@
-require 'dotenv'
-Dotenv.load
-Dotenv.load "~/pipe2me.server.conf"
-
 # The pipe2me version number.
 VERSION = "0.1.0"
 
-# -- tunnel configuration -----------------------------------------------------
+# Note: there is an issue with Dotenv, where an existing .env file overrides
+# any settings in an explicitely stated configuration file. Therefore we cannot
+# use .env AND have a specific configuration file. We use ruby plain instead.
 
-# TUNNEL_DOMAIN: Manage subdomains of this domain
-# TUNNEL_PORTS: Port range for public tunnel endpoint, e.g. "10000...12000"
-
-TUNNEL_DOMAIN = ENV["TUNNEL_DOMAIN"] || "pipe2.dev"
-
-port_range = ENV["TUNNEL_PORT_RANGE"] || "10000...40000"
-raise ArgumentError, "Invalid TUNNEL_PORT_RANGE setting: #{port_range.inspect}" unless port_range =~ /^(\d+)\.\.\.(\d+)$/
-TUNNEL_PORTS = $1.to_i ... $2.to_i
+begin
+  config = File.expand_path("~/pipe2me.server.conf")
+  load config if File.exists?(config)
+end
+load "config/defaults.rb"
 
 # -- path settings ------------------------------------------------------------
 
 ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
-RACK_ENV = ENV["RACK_ENV"] || "development"
 
+RACK_ENV = ENV["RACK_ENV"] || "development"
 if RACK_ENV == "test"
   VAR=File.join "#{ROOT}/var-test"
 else

@@ -1,0 +1,4 @@
+# This is a ruby file.
+
+TUNNEL_DOMAIN = "test.pipe2.me"
+TUNNEL_PORTS = 10000...40000"
