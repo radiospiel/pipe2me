@@ -1,3 +1,5 @@
 *.rb filter=trimWhitespace
 *.ru filter=trimWhitespace
+*.md filter=trimWhitespace
+*.mdown filter=trimWhitespace
 Rakefile filter=trimWhitespace

@@ -49,20 +49,20 @@ Note that this is a ruby file.
 
 This file should contain the following settings:
 
-- `TUNNEL_DOMAIN`: set the server hostname: Each server serves connections for 
+- `TUNNEL_DOMAIN`: set the server hostname: Each server serves connections for
   subdomains of a specific domain. For example, set TUNNEL_DOMAIN to `tunnels.pipe2.test`
   to run tunnels with names like `pink-unicorn.tunnels.pipe2.test`.
 - `TUNNEL_PORTS`: set the range of tunnels available for the server, e.g. "10000...15000"
-- `DYNAMIC_DNS_SERVICE`: which service manages DNS settings? Only currently supported service is 
+- `DYNAMIC_DNS_SERVICE`: which service manages DNS settings? Only currently supported service is
   dnsimple.com; the DNS_SERVICE setting should be "dnsimple:<api_token>". See "Dynamic DNS Configuration"
   below.
 
-An example configuration can be found in `api/doc/pipe2me.server.conf.example`.
-  
+An example configuration can be found in `doc/pipe2me.server.conf.example`.
+
 ### DNS Configuration
 
 A pipe2me server manages a number of subdomains for a given domain. This domain must
-be configured in `TUNNEL_DOMAIN`. DNS for this domain must be configured so that both 
+be configured in `TUNNEL_DOMAIN`. DNS for this domain must be configured so that both
 the domain as any wildcard subdomain resolves to the pipe2me server. For example, the
 `test.pipe2.me` DNS entries are configured like this:
 
