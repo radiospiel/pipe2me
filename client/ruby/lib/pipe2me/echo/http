@@ -57,20 +57,22 @@ end
 
 # -- configure rack server ----------------------------------------------------
 
-server = {
-  :app => Application,
-  :Port => ENV["PORT"] || 8080,
-  :server => "webrick"
-}
-
 require "webrick/https"
 
+options = {
+  :app => Application,
+  :Port => ENV["PORT"] || 8080,
+  :server => "webrick",
+  :Logger => WEBrick::BasicLog.new($stderr, WEBrick::BasicLog::WARN)
+}
+
 if SSL
-  server.update SSLEnable:        true,
-                SSLVerifyClient:  OpenSSL::SSL::VERIFY_NONE,
-                SSLPrivateKey:    OpenSSL::PKey::RSA.new(File.read("#{PIPE2ME_TUNNEL}/openssl.privkey.pem")),
-                SSLCertificate:   OpenSSL::X509::Certificate.new(File.read("#{PIPE2ME_TUNNEL}/openssl.pem")),
-                SSLCertName:      [["CN", WEBrick::Utils::getservername]]
+
+  options.update SSLEnable: true,
+    SSLVerifyClient:        OpenSSL::SSL::VERIFY_NONE,
+    SSLPrivateKey:          OpenSSL::PKey::RSA.new(File.read("#{PIPE2ME_TUNNEL}/openssl.privkey.pem")),
+    SSLCertificate:         OpenSSL::X509::Certificate.new(File.read("#{PIPE2ME_TUNNEL}/openssl.pem")),
+    SSLCertName:            [["CN", WEBrick::Utils::getservername]]
 end
 
-Rack::Server.start(server)
+Rack::Server.start(options)
