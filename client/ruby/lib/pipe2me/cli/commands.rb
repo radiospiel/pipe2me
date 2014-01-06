@@ -37,6 +37,7 @@ module Pipe2me::CLI
 
     tunnel = Pipe2me::Config.tunnel(tunnels.first)
     path = tunnel[:path]
+    puts "TUNNEL_PATH=#{path}"
     puts File.read("#{path}/local.inc")
     puts File.read("#{path}/info.inc")
   end
@@ -55,10 +56,17 @@ module Pipe2me::CLI
     Pipe2me::Config.tunnels(*args).each do |name|
       Pipe2me::Config.tunnel_download name, "id_rsa"
       Pipe2me::Config.tunnel_download name, "id_rsa.pub"
+      Pipe2me::Config.tunnel_download name, "cacert"
       Pipe2me::Config.tunnel_download_certificate name
 
       UI.info "Updating", name
     end
+  end
+
+  banner "list OpenSSL certificates"
+  def certs
+    openssl_conf = File.join Pipe2me::Config.path, "openssl.conf"
+    puts openssl_conf
   end
 
   banner "fetch a new tunnel setup"

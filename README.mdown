@@ -50,9 +50,6 @@ To install ruby2 on Debian we are using *rvm*. In short, run as non-root:
     # verify ruby version
     ruby -v
 
-### The pipe2me server
-https://www.digitalocean.com/community/articles/how-to-use-the-dokku-one-click-digitalocean-image-to-run-a-go-app
-
 ### Installation
 
 To download and install the server software:
@@ -65,14 +62,14 @@ To download and install the server software:
     cd api
     bundle install
 
-    # the var subdirectory contains runtime information, and should be stored
-    # outside of the main directory. It should be kept in either ~/pipe2me.var
-    # or in /var/pipe2me.
+    # the var subdirectory contains runtime information, and should
+    # be stored outside of the main directory. It should be kept in
+    # either ~/pipe2me.var or in /var/pipe2me. We choose ~/pipe2me.var.
     mkdir -p ~/pipe2me.var
     [ -x var ] || ln -sf ~/pipe2me.var var
 
-
-    # install dependencies
+    # install dependencies. You might be asked for the root password,
+    # when some binaries are missing and must be installed.
     bundle exec rake dependencies:install
 
     # initialize database
@@ -120,16 +117,13 @@ connection to a pod if
 The dynamic DNS service is configured with the `DYNAMIC_DNS_SERVICE` setting. The only supported
 service is dnsimple.com; the DYNAMIC_DNS_SERVICE setting should be "dnsimple:<api_token>".
 
-Note: If you want to support this project and decide to use dnsimple.com for your domains
-please use this link to sign up with dnsimple:
-[https://dnsimple.com/r/678c541be02c40](https://dnsimple.com/r/678c541be02c40)
-
 ### Configuring the IP stack.
 
 [todo]
 
 - Reuse closed sockets
 - Increase number of available sockets
+
 
 ### Running the server
 
@@ -200,20 +194,21 @@ by running `. ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me`
 
 ## Testing tunnels
 
-The pipe2me client helps you testing its tunnels. For this it includes "echo"-servers for various
-protocols.
+The pipe2me client helps you testing its tunnels. For this it
+includes "echo"-servers for various protocols.
 
-Assuming you set up tunnels `handsome-lemon-panda.test.pipe2.me` as above. To run the tunnels in test
-mode you would run:
+Assuming you set up tunnels `handsome-lemon-panda.test.pipe2.me` as above.
+To run the tunnels in test mode you would run:
 
     ~/projects/pipe2me/client/ruby[master] > ./bin/pipe2me test
 
-This starts all configured tunnels, and, where available, echo servers on the specified local ports.
-In other words: in our example the command above will run 2 connections to the tunnel server,
-and two echo servers on localhost on the ports 20102 and 20103.
+This starts all configured tunnels, and, where available, echo servers
+on the specified local ports. In other words: in our example the command
+above will run 2 connections to the tunnel server, and two echo servers
+on localhost on the ports 20102 and 20103.
 
-Use your browser or a command line http client to verify the local echo servers. On port 20103
-there should be a plain HTTP server running:
+Use your browser or a command line http client to verify the local echo
+servers. On port 20103 there should be a plain HTTP server running:
 
     # verify http server on port 20103
     ~ > curl http://localhost:20103/hello
@@ -243,8 +238,55 @@ This looks good. Now - what about the HTTPS server?
     GET /hello
 
     # inspect the https server's certificate.
-    ~ > openssl s_client -connect handsome-lemon-panda.test.pipe2.me:10001 < /dev/null 2>/dev/null | openssl x509 -in /dev/stdin  -text | grep Subject.*CN
+    ~ > openssl s_client -connect handsome-lemon-panda.test.pipe2.me:10001 < /dev/null 2>/dev/null \
+         | openssl x509 -in /dev/stdin  -text \
+         | grep Subject.*CN
             Subject: C=de, ST=ne, L=Berlin, O=kinko, CN=handsome-lemon-panda.test.pipe2.me
+
+## Trusting a self-signed certificates
+
+By default the server creates a self-signed certificate which is used to sign
+each individual pod certificate. This means that a client cannot verify it
+using the "official" certificate chain built into his or her browser.
+
+Unless you decide to go with a proper intermediate certificate from a proper
+CA you also might decide to install the self-signed certificate. You find the
+certificate
+
+In that case you would use the downloaded certificate from the server, You
+find it at
+
+    curl http://test.pipe2.me:/hello
+
+The server publishes the certificate used for signing on the "/cacert" URL.
+The certificate is downloaded from the server during the configuration step,
+and it can be found in the ${TUNNEL_PATH}/cacert, where TUNNEL_PATH is a
+result from the "pipe2me env" command:
+
+    > ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me
+    TUNNEL_PATH=/Users/eno/.pipe2me/tunnels/handsome-lemon-panda.test.pipe2.me
+    SERVER=http://test.pipe2.me:5000
+    LOCAL_PORTS=20102,20103
+    ...
+
+    > cat /Users/eno/.pipe2me/tunnels/handsome-lemon-panda.test.pipe2.me/cacert
+    -----BEGIN CERTIFICATE-----
+    MIIDXzCCAkegAwIBAgIJAMOcSUM68l27MA0GCSqGSIb3DQEBBQUAMEYxCzAJBgNV
+    BAYTAkRFMQ8wDQYDVQQIDAZCZXJsaW4xDzANBgNVBAcMBkJlcmxpbjEVMBMGA1UE
+    AwwMcGlwZTJtZS1yb290MB4XDTE0MDEwNTE3NDQ1NVoXDTMzMTIzMTE3NDQ1NVow
+    ....
+
+**Note:** you could also run
+
+    > eval `./bin/pipe2me env handsome-lemon-panda.test.pipe2.me`
+    > cat $TUNNEL_PATH/cacert
+    ...
+
+Now you can use that certificate with your client. The following is an example
+for the `curl` command line client:
+
+    > curl --cacert $TUNNEL_PATH/cacert https://handsome-lemon-panda.test.pipe2.me:10001/hello
+    GET /hello
 
 # Start configured tunnels
 
@@ -299,3 +341,13 @@ changes back into the main codebase. This sounds complicated, but note that you 
 If you feel unsure about this feel free to discuss this issue with us.
 
 (c) The kinko team, 2014
+
+### Supporting this project
+
+> If you are hosting a domain, want to support this project, and decide to have a look
+> at dnsimple.com, please use this link to sign up with dnsimple:
+> [https://dnsimple.com/r/678c541be02c40](https://dnsimple.com/r/678c541be02c40)
+
+> If you decide to run a pipe2me server with a proper intermediate certificate, consider
+> getting one from ...
+
