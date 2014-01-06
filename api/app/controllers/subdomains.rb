@@ -26,6 +26,13 @@ class Controllers::Subdomains < Controllers::Base
     shell subdomains: subdomains.map(&:token)
   end
 
+  # -- return the root certificate --------------------------------------------
+
+  get "/:auth/cacert" do
+    headers["Content-Type"] = "text/plain"
+    File.read "#{VAR}/openssl/root/certificate.pem"
+  end
+
   # -- create: create a new subdomain -----------------------------------------
 
   post "/:auth" do

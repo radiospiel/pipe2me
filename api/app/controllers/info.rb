@@ -4,6 +4,11 @@ class Controllers::Info < Controllers::Base
     "pipe2me API #{VERSION}"
   end
 
+  get "/cacert" do
+    headers["Content-Type"] = "text/plain"
+    File.read "#{VAR}/openssl/root/certificate.pem"
+  end
+
   get "/version" do
     render(
       api: "pipe2me #{VERSION}",
