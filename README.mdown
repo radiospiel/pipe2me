@@ -184,7 +184,7 @@ by the server. To find out more about your tunnels ask pipe2me
 If you need these settings in an own command you can also load these into the environment
 by running `. ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me`
 
-    ~/projects/pipe2me/client/ruby[master] > ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me
+     > ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me
     ...
     URLS_0=https://handsome-lemon-panda.test.pipe2.me:10001
     URLS_1=http://handsome-lemon-panda.test.pipe2.me:10002
@@ -200,7 +200,7 @@ includes "echo"-servers for various protocols.
 Assuming you set up tunnels `handsome-lemon-panda.test.pipe2.me` as above.
 To run the tunnels in test mode you would run:
 
-    ~/projects/pipe2me/client/ruby[master] > ./bin/pipe2me test
+     > ./bin/pipe2me test
 
 This starts all configured tunnels, and, where available, echo servers
 on the specified local ports. In other words: in our example the command
@@ -220,9 +220,6 @@ Port 20102 is configured to run a HTTPS server:
     # certificate verification.
     ~ > curl -k https://localhost:20102/hello
 
-    # inspect the https server's certificate.
-    ~ > openssl s_client -connect localhost:20102 < /dev/null 2>/dev/null | openssl x509 -in /dev/stdin  -text | grep Subject.*CN
-            Subject: C=de, ST=ne, L=Berlin, O=kinko, CN=handsome-lemon-panda.test.pipe2.me
 
 Now verify that the tunnels are working:
 
@@ -230,63 +227,14 @@ Now verify that the tunnels are working:
     ~ > curl http://handsome-lemon-panda.test.pipe2.me:10002/hello
     GET /hello
 
-This looks good. Now - what about the HTTPS server?
-
     # verify http server on port 10001. curl's -k option again disables
     # certificate verification.
     ~ > curl -k https://handsome-lemon-panda.test.pipe2.me:10001/hello
     GET /hello
 
-    # inspect the https server's certificate.
-    ~ > openssl s_client -connect handsome-lemon-panda.test.pipe2.me:10001 < /dev/null 2>/dev/null \
-         | openssl x509 -in /dev/stdin  -text \
-         | grep Subject.*CN
-            Subject: C=de, ST=ne, L=Berlin, O=kinko, CN=handsome-lemon-panda.test.pipe2.me
 
-## Trusting a self-signed certificates
-
-By default the server creates a self-signed certificate which is used to sign
-each individual pod certificate. This means that a client cannot verify it
-using the "official" certificate chain built into his or her browser.
-
-Unless you decide to go with a proper intermediate certificate from a proper
-CA you also might decide to install the self-signed certificate. You find the
-certificate
-
-In that case you would use the downloaded certificate from the server, You
-find it at
-
-    curl http://test.pipe2.me:/hello
-
-The server publishes the certificate used for signing on the "/cacert" URL.
-The certificate is downloaded from the server during the configuration step,
-and it can be found in the ${TUNNEL_PATH}/cacert, where TUNNEL_PATH is a
-result from the "pipe2me env" command:
-
-    > ./bin/pipe2me env handsome-lemon-panda.test.pipe2.me
-    TUNNEL_PATH=/Users/eno/.pipe2me/tunnels/handsome-lemon-panda.test.pipe2.me
-    SERVER=http://test.pipe2.me:5000
-    LOCAL_PORTS=20102,20103
-    ...
-
-    > cat /Users/eno/.pipe2me/tunnels/handsome-lemon-panda.test.pipe2.me/cacert
-    -----BEGIN CERTIFICATE-----
-    MIIDXzCCAkegAwIBAgIJAMOcSUM68l27MA0GCSqGSIb3DQEBBQUAMEYxCzAJBgNV
-    BAYTAkRFMQ8wDQYDVQQIDAZCZXJsaW4xDzANBgNVBAcMBkJlcmxpbjEVMBMGA1UE
-    AwwMcGlwZTJtZS1yb290MB4XDTE0MDEwNTE3NDQ1NVoXDTMzMTIzMTE3NDQ1NVow
-    ....
-
-**Note:** you could also run
-
-    > eval `./bin/pipe2me env handsome-lemon-panda.test.pipe2.me`
-    > cat $TUNNEL_PATH/cacert
-    ...
-
-Now you can use that certificate with your client. The following is an example
-for the `curl` command line client:
-
-    > curl --cacert $TUNNEL_PATH/cacert https://handsome-lemon-panda.test.pipe2.me:10001/hello
-    GET /hello
+This looks good. If you also want to verify the SSL certificates in use
+see the chapter on "SSL"
 
 # Start configured tunnels
 
