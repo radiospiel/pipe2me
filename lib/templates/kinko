@@ -1,0 +1,76 @@
+#!/bin/sh
+ 
+# Quick start-stop-daemon example, derived from Debian /etc/init.d/ssh
+set -e
+ 
+# Must be a valid filename
+NAME=kinko
+USERNAME=kinko
+PIDFILE=/var/run/$NAME.pid
+#This is the command to be run, give the full pathname
+DAEMON=/home/kinko/pipe2me/bin/start
+DAEMON_OPTS=""
+
+ 
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+running() {
+  [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE) 2> /dev/null
+}
+
+start() {
+  if ! running ; then
+    cd /home/kinko/pipe2me
+    start-stop-daemon --start --quiet \
+      --chuid $USERNAME \
+      --background --pidfile $PIDFILE --make-pidfile \
+      --exec /bin/bash -- -c "exec $DAEMON $DAEMON_ARGS > /tmp/kinko.log 2>&1"
+  fi
+}
+
+stop() {
+  if running ; then
+    start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
+  fi
+}
+
+case "$1" in
+  start)
+    if running ; then
+      echo "$NAME: already running"
+    else
+      echo -n "Starting daemon: "$NAME
+      start
+      echo "."
+    fi
+  ;;
+  stop)
+    if ! running ; then
+      echo "$NAME: not running"
+    else
+      echo -n "Stopping daemon: "$NAME
+      stop
+      echo "."
+    fi
+  ;;
+  restart)
+    echo -n "Restarting daemon: "$NAME
+    stop
+    start
+    echo "."
+  ;;
+  status)
+    if running ; then
+      echo "$NAME: running"
+      exit 0
+    else
+      echo "$NAME: not running"
+      exit 1
+    fi
+  ;;
+  *)
+    echo "Usage: "$0" {start|stop|restart}"
+    exit 1
+esac
+
+exit 0

@@ -3,7 +3,7 @@ require 'digest/md5'
 
 module Wordize
   # -- returns an identifier for the current wordize version.
-  # -- When changing the algorithm or the word tables we must 
+  # -- When changing the algorithm or the word tables we must
   # -- change this value.
   VERSION = 0
 
@@ -88,7 +88,7 @@ module Wordize
     rabbit
     kangaroo
     tiger
-    panda 
+    panda
     lion
     giraffe
     leopard
@@ -104,7 +104,7 @@ module Wordize
   }
 end
 
-if __FILE__ == $0 
+if __FILE__ == $0
   def assert_equal(expected, actual)
     raise "#{expected} should be #{actual}" unless expected == actual
   end
