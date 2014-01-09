@@ -4,6 +4,7 @@ echo "$*" >> /tmp/start0
 
 # fix environment
 
+PATH=$PATH:/usr/local/bin
 USER=`whoami`
 if [ -z "$HOME" ]; then
   HOME=$(eval echo ~$USER)

@@ -24,7 +24,7 @@ end
 
 namespace :monit do
   desc "Create monitrc file"
-  task :monitrc do
+  task :monitrc => "nginx:configure" do
     monit_header = <<-MONITRC
 set daemon 10
 set httpd port {{port}} and use address localhost allow localhost
@@ -56,7 +56,7 @@ MONITRC
 
     add.call monit_header, port: 5500
 
-    Procfile.each "Procfile", port: 5501, web: 3 do |group, name, cmd, port|
+    Procfile.each "Procfile", port: 5501, web: 1 do |group, name, cmd, port|
       add.call monitrc, name: name, group: group, cmd: cmd, port: port
     end
 

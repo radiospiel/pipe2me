@@ -2,5 +2,6 @@
 *.ru filter=trimWhitespace
 *.md filter=trimWhitespace
 *.mdown filter=trimWhitespace
-Rakefile filter=trimWhitespace
+*file filter=trimWhitespace
 *.rake filter=trimWhitespace
+*.erb filter=trimWhitespace

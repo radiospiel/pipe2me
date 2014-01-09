@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # -- web server framework -----------------------------------------------------
 
-gem "thin"
+gem "puma"
 
 gem "rack"
 gem "rack_csrf"
