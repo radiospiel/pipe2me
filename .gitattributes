@@ -3,3 +3,4 @@
 *.md filter=trimWhitespace
 *.mdown filter=trimWhitespace
 Rakefile filter=trimWhitespace
+*.rake filter=trimWhitespace

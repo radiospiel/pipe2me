@@ -4,3 +4,4 @@ var-test
 .DS_Store
 server.old
 ._*
+monitrc

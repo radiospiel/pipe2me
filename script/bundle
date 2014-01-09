@@ -1,0 +1,36 @@
+#!/bin/bash
+echo `date` running "$0" "$*" >> /tmp/start0
+echo "$*" >> /tmp/start0
+
+# fix environment
+
+USER=`whoami`
+if [ -z "$HOME" ]; then
+  HOME=$(eval echo ~$USER)
+fi
+
+# load rvm if present
+
+if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  source "$HOME/.rvm/scripts/rvm" 
+fi
+
+# change into directoy
+
+cd $(dirname $0)/..
+
+if [[ -e ".rvmrc" ]]; then
+  source ".rvmrc"
+fi
+
+echo "curdir is $(pwd)" >> /tmp/start0
+echo "bundle is $(which bundle)" >> /tmp/start0
+echo "cmd is $(eval echo $*)" >> /tmp/start0
+
+# start process.
+# exec bundle exec rackup -p 5000
+#set -xve
+#bundle "$@*"
+cmd=$(eval echo $*)
+exec bundle $cmd
+echo "could not start bundle $cmd" >2 
