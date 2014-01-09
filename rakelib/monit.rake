@@ -38,6 +38,8 @@ check process {{name}} with pidfile {{pidfiles}}/{{name}}.pid
 MONITRC
 
     root = File.expand_path("#{File.dirname(__FILE__)}/..")
+    pidfiles = "#{root}/var/pids"
+    FileUtils.mkdir_p pidfiles
 
     options = {
       pidfiles: "#{root}/var/pids",

@@ -1,6 +1,6 @@
 namespace :monit do
   desc "Create and install init.d file"
-  task :install => :install_init_d
+  task :install => [:monitrc, :install_init_d]
 
   task :install_init_d do
     user = `whoami`.chomp
