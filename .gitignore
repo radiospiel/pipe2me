@@ -1,3 +1,5 @@
+var
+tmp/restart.txt
+var-test
 .DS_Store
 server.old
-._*

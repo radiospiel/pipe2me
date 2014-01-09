@@ -1,5 +1,0 @@
-source "https://rubygems.org"
-
-gem 'foreman'
-gem 'foreman-export-initscript'
-# gem 'addressable'
