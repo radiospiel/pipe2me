@@ -2,23 +2,43 @@ require 'rake/task.rb'
 
 module Rake::Install
   def self.os_name
-    @os_name ||= `uname`.chomp.downcase
+    @os_name ||= begin
+      os_name = `uname`.chomp.downcase
+      if os_name == "linux"
+        if File.exist?("/etc/debian_version")
+          os_name = "debian"
+        end
+      end
+      os_name
+    end
   end
 
   class Task < Rake::Task
-    def binary
+    attr :canary, true
+
+    def package
       self.name.split(":").last
     end
 
     def needed?
-      path = `which #{binary}`.chomp
-      STDERR.puts "Using #{binary} in #{path}" if $?.exitstatus == 0
-      STDERR.puts "Going to install #{binary}" if $?.exitstatus != 0
-      $?.exitstatus != 0
+      if canary.starts_with?("/")
+        if File.exists?(canary)
+          STDERR.puts "Using #{canary}"
+          false
+        else
+          STDERR.puts "Missing #{canary}"
+          true
+        end
+      else
+        path = `which #{canary}`.chomp
+        STDERR.puts "Using #{canary} in #{path}" if $?.exitstatus == 0
+        STDERR.puts "Going to install #{package}" if $?.exitstatus != 0
+        $?.exitstatus != 0
+      end
     end
 
     def execute(arg=nil)
-      raise "Cannot find #{binary}"
+      raise "Cannot find #{package}"
       super
     end
 
@@ -30,21 +50,29 @@ module Rake::Install
 
     def self.define_tasks(*names, &block)
       names.each do |name|
-        define_task(name, &block)
+        if name.is_a?(Hash)
+          name.each do |package, canary|
+            task = define_task(package, &block)
+            task.canary = canary
+          end
+        else
+          task = define_task(name, &block)
+          task.canary = name
+        end
       end
     end
   end
 
   class AptTask < Task
     def execute(arg=nil)
-      sys "apt-get install #{binary}"
+      sys "sudo apt-get install #{package}"
       super
     end
   end
 
   class BrewTask < Task
     def execute(arg=nil)
-      sys "brew install #{binary}"
+      sys "brew install #{package}"
       super
     end
   end
