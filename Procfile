@@ -1,2 +1,2 @@
-web: bundle exec rackup -p 5000
-sshd: bundle exec rake sshd:exec
+web: rackup -p $PORT
+sshd: rake sshd:exec

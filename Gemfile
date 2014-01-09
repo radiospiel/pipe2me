@@ -1,7 +1,5 @@
 source "https://rubygems.org"
 
-gem "foreman"
-
 # -- web server framework -----------------------------------------------------
 
 gem "thin"
@@ -29,4 +27,3 @@ end
 # -- use foreman to create startup files --------------------------------------
 
 gem "foreman"
-gem "foreman-export-initscript"
