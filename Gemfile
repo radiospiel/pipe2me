@@ -25,3 +25,8 @@ end
 group :development do
   gem "etest-unit"
 end
+
+# -- use foreman to create startup files --------------------------------------
+
+gem "foreman"
+gem "foreman-export-initscript"
