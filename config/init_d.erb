@@ -1,36 +1,3 @@
-namespace :monit do
-  desc "Create and install init.d file"
-  task :install => [:monitrc, :install_init_d]
-
-  task :install_init_d do
-    user = `whoami`.chomp
-    init_d = "var/#{user}.init_d"
-    File.open init_d, "w" do |io|
-      src = File.read(__FILE__).split(/__END__\s+/).last
-      io.write ERB.new(src).result
-    end
-
-    FileUtils.chmod 0755, init_d
-
-    puts <<-TXT
-Created file #{init_d}. Copy it into /etc/init.d via
-
-    sudo cp #{init_d} /etc/init.d/#{user}
-
-and start the services via
-
-    sudo /etc/init.d/#{user} start
-
-To make sure the service starts automatically after a reboot, please run
-
-    sudo update-rc.d kinko defaults
-
-    TXT
-  end
-end
-
-__END__
-
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          <%= `whoami`.chomp %>
@@ -44,7 +11,7 @@ __END__
 set -e
 
 USER=<%= `whoami`.chomp %>
-MONIT=monit
+MONIT=monit -c <%= File.expand_path "monitrc" %>
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin:/usr/bin"
 
