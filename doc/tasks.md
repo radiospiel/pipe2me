@@ -1,4 +1,4 @@
-[ ] Move ssh private key generation to client.
+[X] Move ssh private key generation to client.
 
 [ ] Verify domain and DNS setting (i.e. compare dig $(hostname) +short with TUNNEL_DOMAIN)
 

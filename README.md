@@ -124,22 +124,28 @@ service is dnsimple.com; the DYNAMIC_DNS_SERVICE setting should be "dnsimple:<ap
 - Reuse closed sockets
 - Increase number of available sockets
 
-
 ### Running the server
 
 To **run the pipe2me server in the foreground** change into the `./api` directory and run:
 
     foreman start
 
-To **install the pipe2me server as a inittab service** change the `./api` directory and run:
+### Installing the server on Debian
 
-    foreman export ...
-    ...
+To install the server on a debian system, use foreman to create the respective startup
+script:
 
-To **install the pipe2me server as a /etc/init.d service** change the `./api` directory and run:
+    foreman export initscript `pwd`/var/init.d --log `pwd`/var/log --app `whoami` --user `whoami`
+    chmod 755 var/init.d/kinko/`whoami`
 
-    foreman export ...
-    ...
+then copy the script into /etc/init.d and try to start the service:
+
+    sudo cp var/init.d/`whoami` /etc/init.d
+    sudo /etc/init.d/`whoami` start
+
+Give it a second to start, then verify the status
+
+    sudo /etc/init.d/`whoami` status
 
 ## pipe2me pod client
 

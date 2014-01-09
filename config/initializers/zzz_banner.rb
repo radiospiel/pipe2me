@@ -1,3 +1,5 @@
+if $0 !~ /rake$/
+
 puts <<-BANNER
 === pipe2me #{VERSION} =========================================
 ROOT                = #{ROOT.inspect}
@@ -8,3 +10,5 @@ SSHD.listen_address = #{SSHD.listen_address.inspect}
 DATABASE_URL        = #{DATABASE_URL.inspect}
 ================================================================
 BANNER
+
+end

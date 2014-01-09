@@ -6,3 +6,4 @@ server.old
 ._*
 monitrc
 config/nginx.conf
+.bundle/
