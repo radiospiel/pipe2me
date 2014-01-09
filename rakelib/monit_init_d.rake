@@ -19,7 +19,12 @@ Created file #{init_d}. Copy it into /etc/init.d via
 
 and start the services via
 
-    /etc/init.d/#{user} start
+    sudo /etc/init.d/#{user} start
+
+To make sure the service starts automatically after a reboot, please run
+
+    sudo update-rc.d kinko defaults
+
     TXT
   end
 end
@@ -29,6 +34,8 @@ __END__
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          <%= `whoami`.chomp %>
+# Required-Start:
+# Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: The <%= `whoami`.chomp %> process group
