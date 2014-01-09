@@ -50,7 +50,7 @@ store_pid() {
 # This starts a command asynchronously and stores its pid in a list for use
 # later on in the script.
 start_command() {
-  sh -c "$1" &
+  sh -c "exec $1" &
   pid="$!"
   store_pid "$pid"
 }
@@ -89,7 +89,7 @@ done < "$PROCFILE"
 # should probably go at some point.
 onexit() {
   echo SIGINT received
-  echo sending SIGTERM to all processes
+  echo sending SIGTERM to all processes, pids: ${pids[*]}
   kill ${pids[*]} &>/dev/null
   sleep 1
 }
