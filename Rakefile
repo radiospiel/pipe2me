@@ -8,7 +8,3 @@ namespace :sshd do
     SSHD.exec
   end
 end
-
-desc "Install dependencies"
-task "dependencies:install" do
-end
