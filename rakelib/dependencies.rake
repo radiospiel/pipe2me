@@ -5,10 +5,11 @@ namespace :install do
   packages :dependencies, "daemon", "monit", "sshd"
   packages :dependencies, "daemon"
   packages :dependencies, "nginx"
+  # packages :dependencies, "sslh"
 
   namespace :darwin do
     binary "sshd"
-    brew "daemon", "monit", "nginx"
+    brew "daemon", "monit", "nginx", "sslh"
   end
 
   namespace :debian do
@@ -16,5 +17,6 @@ namespace :install do
     apt "nginx" => "/usr/sbin/nginx"
     apt "daemon"
     apt "monit"
+    apt "sslh"
   end
 end
