@@ -1,6 +1,6 @@
 namespace :nginx do
   desc "Create etc/nginx.conf"
-  task :configure do
+  task :configure => "ca:init" do
     nginx_conf_file = "config/nginx.conf"
     erb = ERB.new File.read("config/nginx.conf.erb")
 

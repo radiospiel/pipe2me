@@ -5,3 +5,4 @@
 *file filter=trimWhitespace
 *.rake filter=trimWhitespace
 *.erb filter=trimWhitespace
+*.conf filter=trimWhitespace

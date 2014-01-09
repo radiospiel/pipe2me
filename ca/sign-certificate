@@ -8,7 +8,7 @@
 # -- initialize CA ------------------------------------------------------------
 
 HERE=$(cd `dirname $0` && pwd)
-. $HERE/init-ca
+. $HERE/config
 
 # -- generate certificate -----------------------------------------------------
 

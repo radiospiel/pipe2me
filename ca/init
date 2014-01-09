@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Generate a SSL certificate for a specific domain name. 
+#
+#   mk-certificate domainname
+#
+
+# -- initialize CA ------------------------------------------------------------
+
+HERE=$(cd `dirname $0` && pwd)
+. $HERE/config
