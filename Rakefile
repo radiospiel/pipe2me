@@ -1,10 +1,9 @@
 require "sinatra/activerecord/rake"
 require_relative "config/environment"
 
-namespace :sshd do
-  desc "Start sshd server non-daemonized"
-  task :exec do
-    require "sshd"
-    SSHD.exec
-  end
-end
+task :configure => "var/config"
+directory "var/config"
+
+task :configure => "nginx:configure"
+task :configure => "sshd:configure"
+task :configure => "monit:configure"

@@ -12,44 +12,13 @@ module SSHD
     @user ||= `whoami`.chomp
   end
 
-  # start a SSHD server.
-
-  def exec
-    # -- create sshd path --------------------------------
-    unless Dir.exists? path(:sshd_dir)
-      FileUtils.mkdir_p path(:sshd_dir)
-    end
-
-    # -- create sshd host_key
-    unless File.exists? path(:host_key)
-      Sys.sys! "ssh-keygen", "-t", "rsa", "-f", SSHD.path(:host_key), "-N", ''
-    end
-
-    # -- write config and authorized_keys
-
-    write_config
-    write_authorized_keys
-
-    command = [ "/usr/sbin/sshd", "-D", "-e", "-f", SSHD.path(:sshd_config) ]
-    STDERR.puts "Running #{command.join(" ")}"
-    Kernel.exec *command
-  end
-
   # -- paths ------------------------------------------------------------------
 
   def path(*parts)
     File.join root, *parts.map(&:to_s)
   end
 
-  # -- sshd_config ------------------------------------------------------------
-
-  def write_config
-    template = File.join File.dirname(__FILE__), "sshd.conf.erb"
-    erb = ERB.new File.read(template)
-    config = erb.result binding
-    File.atomic_write path(:sshd_config), config
-    STDERR.puts "Created #{path(:sshd_config)}"
-  end
+  # -- authorized_keys --------------------------------------------------------
 
   # write the authorized_keys file.
   #

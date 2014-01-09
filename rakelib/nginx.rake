@@ -1,13 +1,9 @@
 namespace :nginx do
-  desc "Create etc/nginx.conf"
+  desc "Create var/config/nginx.conf"
   task :configure => "ca:init" do
-    nginx_conf_file = "config/nginx.conf"
-    erb = ERB.new File.read("config/nginx.conf.erb")
+    require_relative "erb_ext"
 
-    File.open nginx_conf_file, "w" do |io|
-      io.write erb.result
-    end
-
-    puts "Created #{nginx_conf_file}"
+    FileUtils.cp_r "config/nginx", "var/config"
+    ERB.process "config/nginx.conf.erb" => "var/config/nginx.conf"
   end
 end

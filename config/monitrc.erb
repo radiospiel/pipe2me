@@ -1,0 +1,11 @@
+<% DAEMON = `which daemon`.chomp %>
+
+set daemon 10
+set httpd port 5500 and use address localhost allow localhost
+
+<% Procfile.each("Procfile") do |group, name, cmd, port| %>
+check process <%= name %> with pidfile <%= PIDDIR %>/<%= name %>.pid
+    start program = "<%= DAEMON %> -N --name <%= name %> --pidfiles <%= PIDDIR %> -- env PORT=<%= port %> <%= BUNDLE %> exec <%= cmd %>" with timeout 60 seconds
+    stop program = "<%= DAEMON %> -N --name <%= name %> --pidfiles <%= PIDDIR %> --stop"
+    group <%= group %>
+<% end %>
