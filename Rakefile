@@ -1,6 +1,7 @@
 require "sinatra/activerecord/rake"
 require_relative "config/environment"
 
+task :configure => "install:dependencies"
 task :configure => "var/config"
 directory "var/config"
 

@@ -11,8 +11,7 @@
 set -e
 
 USER=<%= `whoami`.chomp %>
-MONIT=monit
-MONITRC=<%= File.expand_path "monitrc" %>
+MONIT=monit -c <%= File.expand_path "monitrc" %>
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin:/usr/bin"
 

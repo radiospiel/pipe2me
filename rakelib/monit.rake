@@ -10,6 +10,6 @@ namespace :monit do
 
     ERB.process "config/monitrc.erb" => "var/config/monitrc"
     FileUtils.chmod 0600, "var/config/monitrc"
-    FileUtils.ln_sf "var/config/monitrc", "."
+    FileUtils.ln_sf "var/config/monitrc", "monitrc"
   end
 end
