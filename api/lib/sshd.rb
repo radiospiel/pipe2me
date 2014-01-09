@@ -12,22 +12,6 @@ module SSHD
     @user ||= `whoami`.chomp
   end
 
-  # generate a SSH keypair for a specific name, and return the
-  # public and private key.
-  def keygen(name)
-    UI.benchmark "[#{name}] create ssh identity" do
-      Dir.mktmpdir do |dir|
-        Sys.sys! "ssh-keygen",
-           "-f", "#{dir}/id_rsa",
-           "-t", "rsa",
-           "-C", name,
-           "-N", ""
-
-        [ File.read("#{dir}/id_rsa.pub"), File.read("#{dir}/id_rsa") ]
-      end
-    end
-  end
-
   # start a SSHD server.
 
   def exec

@@ -48,14 +48,10 @@ class Controllers::Subdomains < Controllers::Base
     shell public_attributes(subdomain)
   end
 
-  get "/:token/id_rsa" do
-    subdomain.ssh_keygen!
-    subdomain.ssh_private_key
-  end
-
-  get "/:token/id_rsa.pub" do
-    subdomain.ssh_keygen!
-    subdomain.ssh_public_key
+  post "/:token/id_rsa.pub" do
+    id_rsa_pub = request.body.read.to_s
+    subdomain.add_ssh_key id_rsa_pub
+    "OK"
   end
 
   get "/:token/cert.pem" do

@@ -123,14 +123,8 @@ class Subdomain < ActiveRecord::Base
   scope :with_ssh_keys, -> { where "ssh_public_key IS NOT NULL " }
   scope :without_ssh_keys, -> { where "ssh_public_key IS NULL " }
 
-  # generate and save ssh keys if missing.
-  def ssh_keygen!
-    return if ssh_public_key.present? && ssh_private_key.present?
-
-    require "sshd"
-
-    ssh_public_key, ssh_private_key = SSHD.keygen(fqdn)
-    update_attributes! ssh_public_key: ssh_public_key, ssh_private_key: ssh_private_key
+  def add_ssh_key(ssh_public_key)
+    update_attributes! :ssh_public_key => ssh_public_key
     SSHD.write_authorized_keys
   end
 end

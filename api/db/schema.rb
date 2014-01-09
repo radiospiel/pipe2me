@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 1) do
+ActiveRecord::Schema.define(version: 2) do
 
   create_table "subdomain_ports", force: true do |t|
     t.integer  "port"
@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(version: 1) do
     t.string   "endpoint"
     t.string   "fqdn"
     t.text     "ssh_public_key"
-    t.text     "ssh_private_key"
     t.text     "openssl_certificate"
     t.datetime "created_at"
     t.datetime "updated_at"
