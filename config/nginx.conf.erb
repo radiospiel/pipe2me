@@ -2,10 +2,12 @@
 # http://nginx.org/en/docs/ngx_core_module.html for documentation.
 
 # user       www www;  ## Default: nobody
+user <%= `whoami`.chomp %>;
 # worker_processes  1;  ## Default: 1
 
-# error_log    ${{VAR}}/log/proxy-errors.log  main;
+pid <%= VAR %>/pids/nginx.pid;
 
+# error_log    ${{VAR}}/log/proxy-errors.log  main;
 error_log      /dev/stdout;
 
 # pid         ${{VAR}}/log/nginx.pid;

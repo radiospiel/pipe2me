@@ -11,28 +11,29 @@
 set -e
 
 USER=<%= `whoami`.chomp %>
-MONIT=monit -c <%= File.expand_path "monitrc" %>
+MONIT="monit -c <%= File.expand_path "monitrc" %>"
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin:/usr/bin"
 
 case "$1" in
   start)
     echo -n "Starting monit services: "$USER
-    su - $USER bash -c $MONIT start all
+    echo su - $USER bash -c $MONIT start all
+    su - $USER bash -c "$MONIT start all"
     echo "."
   ;;
   stop)
     echo -n "Stopping monit services: "$USER
-    su - $USER bash -c $MONIT stop all
+    su - $USER bash -c "$MONIT stop all"
     echo "."
   ;;
   restart)
     echo -n "Restarting monit services: "$USER
-    su - $USER bash -c $MONIT restart all
+    su - $USER bash -c "$MONIT restart all"
     echo "."
   ;;
   status)
-    su - $USER bash -c $MONIT status
+    su - $USER bash -c "$MONIT status"
   ;;
   *)
     echo "Usage: "$0" {start|stop|restart|status}"
