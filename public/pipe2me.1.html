@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>pipe2me(1) - manage tunnels to a pipe2me server</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#FILES">FILES</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#TUNNEL-SETUP">TUNNEL SETUP</a>
+    <a href="#SHOW-TUNNEL-SETTINGS">SHOW TUNNEL SETTINGS</a>
+    <a href="#START-TUNNELS">START TUNNELS</a>
+    <a href="#TEST-TUNNELS">TEST TUNNELS</a>
+    <a href="#EXPORT-STARTUP-SCRIPTS">EXPORT STARTUP SCRIPTS</a>
+    <a href="#BUGS">BUGS</a>
+    <a href="#LIMITATIONS">LIMITATIONS</a>
+    <a href="#COPYRIGHT">COPYRIGHT</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>pipe2me(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>pipe2me(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>pipe2me</code> - <span class="man-whatis">manage tunnels to a pipe2me server</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>pipe2me</code> [ options ] setup ...<br />
+<code>pipe2me</code> [ options ] env<br />
+<code>pipe2me</code> [ options ] start<br />
+<code>pipe2me</code> [ options ] echo<br />
+<code>pipe2me</code> [ options ] export [ format ]<br /></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><strong>pipe2me</strong> is a client for the pipe2me server package, which helps tunnel
+TCP connections through routers.</p>
+
+<h2 id="FILES">FILES</h2>
+
+<p><strong>pipe2me</strong> manages a set of tunnels, with a common FQDN (fully qualified
+domain name) in a single directory. This directory contains these files:</p>
+
+<ul>
+<li><em>pipe2me.id_rsa</em>: the SSH public key</li>
+<li><em>pipe2me.id_rsa.pub</em>: the SSH private key</li>
+<li><em>pipe2me.info.inc</em>: settings managed by the pipe2me server</li>
+<li><em>pipe2me.local.inc</em>: settings managed by the client</li>
+<li><em>pipe2me.openssl.cert</em>: openssl certificate</li>
+<li><em>pipe2me.openssl.priv</em>: openssl private key</li>
+<li><em>pipe2me.procfile.tunnels</em>: procfile to run tunnels</li>
+</ul>
+
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<p>These options control the pipe2me operations.</p>
+
+<dl>
+<dt><code>-h</code>, <code>--help</code></dt><dd>Show pipe2me help information and exit.</dd>
+<dt><code>-v</code>, <code>--verbose</code></dt><dd>Be more verbose.</dd>
+<dt><code>-q</code>, <code>--quiet</code></dt><dd>Be more quiet.</dd>
+<dt><code>-s</code>, <code>--silent</code></dt><dd>Be absolutely silent.</dd>
+</dl>
+
+
+<h2 id="TUNNEL-SETUP">TUNNEL SETUP</h2>
+
+<p><code>pipe2me</code> [ options ] setup ...<br /></p>
+
+<p>These options control the tunnel setup:</p>
+
+<p>Options include:</p>
+
+<ul>
+<li><code>--server</code>, <code>-s</code> servername:
+Use pipe2.me server on that host (default: http://pipe2.dev)</li>
+<li><code>--auth</code>, <code>-a</code> authtoken: <br />
+pipe2.me auth token (default: pipe2-dev-token)</li>
+<li><code>--protocols</code>, <code>-p</code> protocols: <br />
+protocol names, e.g. 'http,https,imap' (default: https)</li>
+<li><code>--local-ports</code>, <code>-l</code> ports: <br />
+local ports, one per protocol</li>
+</ul>
+
+
+<h3 id="EXAMPLES">EXAMPLES</h3>
+
+<p>Setup 3 tunnels under a specific FQDN:</p>
+
+<pre><code>$ pipe2me setup --protocols=https,http,imap
+</code></pre>
+
+<h2 id="SHOW-TUNNEL-SETTINGS">SHOW TUNNEL SETTINGS</h2>
+
+<p><code>pipe2me</code> env<br /></p>
+
+<p>shows the tunnel configuration in the current directory.</p>
+
+<h3 id="EXAMPLES">EXAMPLES</h3>
+
+<pre><code>$ pipe2me env
+./bin/pipe2me env
+PIPE2ME_SERVER=http://pipe2.dev
+PIPE2ME_TOKEN=69o1ykbfzggz9lcd6qjzkggq7
+PIPE2ME_FQDN=handsome-snowwhite-hamster.pipe2.dev
+PIPE2ME_URLS_0=https://handsome-snowwhite-hamster.pipe2.dev:10049
+PIPE2ME_TUNNEL=ssh://eno@pipe2.dev:4444
+</code></pre>
+
+<h2 id="START-TUNNELS">START TUNNELS</h2>
+
+<p><code>pipe2me</code> start<br /></p>
+
+<p>starts all configured tunnels.</p>
+
+<h2 id="TEST-TUNNELS">TEST TUNNELS</h2>
+
+<p><code>pipe2me</code> test<br /></p>
+
+<p>starts all configured tunnels and, whereever available, an echo server on
+the local machine. This command is intended for testing.</p>
+
+<p>echo servers are currently supported for these protocols:</p>
+
+<ul>
+<li>http</li>
+<li>https</li>
+</ul>
+
+
+<h2 id="EXPORT-STARTUP-SCRIPTS">EXPORT STARTUP SCRIPTS</h2>
+
+<p><code>pipe2me</code> export [ format ]<br /></p>
+
+<p>exports startup script(s) in a number of supported formats. Startup scripts
+are created in <code>pipe2me.exports.&lt;format></code>.</p>
+
+<p>Currently the
+following formats are supported:</p>
+
+<ul>
+<li>initscript (default): /etc/init.d init scripts</li>
+<li>upstart: Ubuntus upstart daemon manager</li>
+<li>inittab: Linux inittab</li>
+<li>runit: <span class="man-ref">runit<span class="s">(8)</span></span></li>
+</ul>
+
+
+<p>Support for exports is supplied via <a href="http://ddollar.github.io/foreman/">foreman</a>.</p>
+
+<h2 id="BUGS">BUGS</h2>
+
+<p>The installed version of <strong>pipe2me</strong> is written in Ruby. A more portable
+and version of this program - e.g. in bash - would be welcome.</p>
+
+<h2 id="LIMITATIONS">LIMITATIONS</h2>
+
+<p>When you create a HTTPS tunnel on a server with a name pinkbunny.pipe2.server, which
+ends up at port 1337, the server redirects all connections that arrive at the HTTPS
+default port (443) to pinkbunny.pipe2.server:1337. This is a convinience feature, but
+it encrypts this connection step using a wildcard certificate for <code>*.pipe2.server</code>.
+This means that the initial request - including and other potentially relevant information -
+could be read by the pipe2me server, and is a limitation of the involved protocols.</p>
+
+<p>If you are concerned don't use this feature, but use the correct domain name <strong>and port</strong>
+from the go. If you rely on this feature we recommend at least to transfer cookies only on
+subdirectories.</p>
+
+<h2 id="COPYRIGHT">COPYRIGHT</h2>
+
+<p><strong>pipe2me</strong> is Copyright (C) 2013,1024 The kinko team <a href="https://kinko.me" data-bare-link="true">https://kinko.me</a></p>
+
+<p>The software contains third party code under their respective copyrights.
+Please see the README.md file for more information.</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><span class="man-ref">ssh<span class="s">(1)</span></span>, <span class="man-ref">sshd<span class="s">(8)</span></span>, <span class="man-ref">autossh<span class="s">(1)</span></span>, <span class="man-ref">runit<span class="s">(8)</span></span>, <span class="man-ref">inittab<span class="s">(8)</span></span>.</p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>January 2014</li>
+    <li class='tr'>pipe2me(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

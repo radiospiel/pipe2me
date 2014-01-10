@@ -1,0 +1,62 @@
+<pre>
+<strong>~/pipe2me-client[master] &gt; ./bin/pipe2me setup -p http,https</strong>
+[POST] http://test.pipe2.me:8080/subdomains/pipe2-dev-token: 192 msecs.
+Generating public/private rsa key pair.
+Your identification has been saved in pipe2me.id_rsa.
+Your public key has been saved in pipe2me.id_rsa.pub.
+The key fingerprint is:
+78:58:98:61:72:8f:c4:c2:61:4e:c5:cc:f8:99:4b:68 pretty-ivory-horse.test.pipe2.me
+The key's randomart image is:
++--[ RSA 2048]----+
+|   .=O*          |
+|   ++==*         |
+|    .++oo        |
+|    E =+         |
+|   . .o.S        |
+|      ..         |
+|                 |
+|                 |
+|                 |
++-----------------+
+[POST] http://test.pipe2.me:8080/subdomains/phzup8dwv2smfpzyuvpa7mcy/id_rsa.pub: 97 msecs.
+Generating a 1024 bit RSA private key
+..................++++++
+..........................++++++
+writing new private key to 'pipe2me.openssl.priv'
+-----
+[POST] http://test.pipe2.me:8080/subdomains/phzup8dwv2smfpzyuvpa7mcy/cert.pem: 131 msecs.
+pretty-ivory-horse.test.pipe2.me
+
+<strong>~/pipe2me-client[master] &gt; cat pipe2me.info.inc |grep URL</strong>
+PIPE2ME_URLS_0=http://pretty-ivory-horse.test.pipe2.me:10003
+PIPE2ME_URLS_1=https://pretty-ivory-horse.test.pipe2.me:10004
+
+<strong>~/pipe2me-client[master] &gt; ./bin/pipe2me echo &amp;</strong>
+[1] 41033
+
+<strong>~/pipe2me-client[master] &gt; Starting http echo server on port 10003</strong>
+Starting https echo server on port 10004
+http_10003: started at PID 41038
+            env AUTOSSH_GATETIME=0  autossh -M 0 kinko@test.pipe2.me -p 4444 -R 0.0.0.0:10003:localhost:10003 -i pipe2me.id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=pipe2me.known_hosts -N
+https_10004: started at PID 41039
+            env AUTOSSH_GATETIME=0  autossh -M 0 kinko@test.pipe2.me -p 4444 -R 0.0.0.0:10004:localhost:10004 -i pipe2me.id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=pipe2me.known_hosts -N
+echo_10003: started at PID 41040
+            env PORT=10003 /Users/eno/pipe2me-client/lib/pipe2me/tunnel/echo/http
+echo_10004: started at PID 41041
+            env PORT=10004 /Users/eno/pipe2me-client/lib/pipe2me/tunnel/echo/https
+Starting http server at port 10003
+Starting https server at port 10004
+Warning: Permanently added '[test.pipe2.me]:4444,[146.185.137.78]:4444' (RSA) to the list of known hosts.
+
+<strong>~/pipe2me-client[master] &gt; curl http://pretty-ivory-horse.test.pipe2.me:10003/hello</strong>
+localhost - - [10/Jan/2014:10:38:46 CET] &quot;GET /hello HTTP/1.1&quot; 200 11
+- -&gt; /hello
+GET /hello
+
+<strong>~/pipe2me-client[master] &gt; curl -k https://pretty-ivory-horse.test.pipe2.me:10004/hello</strong>
+localhost - - [10/Jan/2014:10:38:56 CET] &quot;GET /hello HTTP/1.1&quot; 200 11
+- -&gt; /hello
+GET /hello
+
+<strong>~/pipe2me-client[master] &gt; </strong>
+</pre>
