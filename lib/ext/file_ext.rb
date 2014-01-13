@@ -13,4 +13,13 @@ class File
     tmpfile.close! rescue nil                 # close and deletes the temp file
     raise
   end
+
+  def self.secret(path, &block)
+    unless exists?(path)
+      FileUtils.mkdir_p dirname(path)
+      secret = block_given? ? yield : SecureRandom.base64(16).gsub(/=+$/, "")
+      atomic_write path, secret
+    end
+    read path
+  end
 end

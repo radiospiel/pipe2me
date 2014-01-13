@@ -44,16 +44,7 @@ use Rack::ContentLength
 
 # -- load session_key ---------------------------------------------------------
 
-session_key_path = "#{File.dirname(__FILE__)}/var/rack.session_key"
-
-unless File.exists?(session_key_path)
-  FileUtils.mkdir_p File.dirname(session_key_path)
-  File.open session_key_path, "w" do |io|
-    io.write SecureRandom.base64(16).gsub(/=+$/, "")
-  end
-end
-
-use Rack::Session::Cookie, :secret => File.read(session_key_path)
+use Rack::Session::Cookie, :secret => File.secret("#{VAR}/rack.session_key")
 
 # -- CSRF protection ----------------------------------------------------------
 

@@ -37,6 +37,10 @@ end
 require "active_record"
 require "models/subdomain"
 
+# -- initialize models --------------------------------------------------------
+
+Subdomain.token_secret = File.secret "var/token_secret"
+
 # we must load the controllers/base file to make sure that the database
 # is actually connected. Yes, that sounds weird, but this is how
 # sinatra-active_record works (and we need this only for rake tasks anyway.)
