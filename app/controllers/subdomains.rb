@@ -61,7 +61,6 @@ class Controllers::Subdomains < Controllers::Base
   end
 
   get "/:token/cert.pem" do
-    # subdomain.openssl_certgen!
     subdomain.openssl_certificate
   end
 

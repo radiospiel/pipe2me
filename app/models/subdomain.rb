@@ -115,14 +115,6 @@ class Subdomain < ActiveRecord::Base
 
   # -- OpenSSL cerificate -----------------------------------------------------
 
-  def openssl_certgen!
-    return if openssl_certificate?
-
-    Sys.sys! "#{ROOT}/ca/mk-certificate", fqdn
-    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{fqdn}.pem"
-    update_attributes! :openssl_certificate => openssl_certificate
-  end
-
   def openssl_sign_certificate!(csr)
     tmpfile = Tempfile.new("#{fqdn}.csr")
     tmpfile.write csr
