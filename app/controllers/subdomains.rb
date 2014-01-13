@@ -36,9 +36,15 @@ class Controllers::Subdomains < Controllers::Base
   # -- create: create a new subdomain -----------------------------------------
 
   post "/:auth" do
-    protocols = params[:protocols] || "http"
-    subdomain = Subdomain.create! protocols: protocols.split(",")
-    shell public_attributes(subdomain)
+    case auth = params[:auth]
+    when "test@test.kinko.me", "review@test.kinko.me"
+      protocols = params[:protocols] || "http"
+      subdomain = Subdomain.create! protocols: protocols.split(",")
+      shell public_attributes(subdomain)
+    else
+      status 403
+      "Not allowed"
+    end
   end
 
   # -- show: get an individual subdomain --------------------------------------
