@@ -10,3 +10,5 @@ directory "var/config"
 task :configure => "nginx:configure"
 task :configure => "sshd:configure"
 task :configure => "monit:configure"
+
+task :default => "test"
