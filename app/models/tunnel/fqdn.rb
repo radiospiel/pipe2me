@@ -1,23 +1,31 @@
 require "wordize"
 
 module Tunnel::FQDN
-  def self.choose
+  extend self
+
+  def generate
+    generate = lambda {
+      Wordize.wordize + ".#{TUNNEL_DOMAIN}"
+    }
+
     3.times do
-      fqdn = generate
+      fqdn = generate.call
       return fqdn unless Tunnel.where(fqdn: fqdn).first
     end
 
     8.times do
-      fqdn = generate
+      fqdn = generate.call
       return fqdn unless Tunnel.where(fqdn: fqdn).first
       fqdn += "-#{rand(10)}"
       return fqdn unless Tunnel.where(fqdn: fqdn).first
     end
 
-    raise "Cannot choose a new name"
+    raise "Cannot generate a new name"
   end
+end
 
-  def self.generate
-    Wordize.wordize(rand(100000)) + ".#{TUNNEL_DOMAIN}"
+module Tunnel::FQDN::Etest
+  def test_generate_fqdn
+    assert Tunnel::FQDN.generate.ends_with? ".#{TUNNEL_DOMAIN}"
   end
 end

@@ -1,22 +1,8 @@
 #!/usr/bin/env ruby
-require 'digest/md5'
 
 module Wordize
-  # -- returns an identifier for the current wordize version.
-  # -- When changing the algorithm or the word tables we must
-  # -- change this value.
-  VERSION = 0
-
-  def self.wordize(i32)
-    case i32
-    when Fixnum
-      i32 %= 0xffffffff
-    else
-      # 8 hexdigits are enough for a 32 bit number, which is more than enough
-      # for our ~10k names
-      s32 = Digest::MD5.hexdigest(word)[0,8]
-      i32 = s32.to_i(16)
-    end
+  def self.wordize
+    i32 = rand(0xffffffff)
 
     parts = [MOODS, COLORS, ANIMALS].map do |words|
       # get remainder for table in this round.
@@ -104,14 +90,13 @@ module Wordize
   }
 end
 
-if __FILE__ == $0
-  def assert_equal(expected, actual)
-    raise "#{expected} should be #{actual}" unless expected == actual
+module Wordize::Etest
+  def test_wordize_rnd
+    w1 = Wordize.wordize
+    w2 = Wordize.wordize
+
+    assert w1 =~ /[a-z]+-[a-z]+-[a-z]+/
+    assert w2 =~ /[a-z]+-[a-z]+-[a-z]+/
+    assert_not_equal(w1, w2)
   end
-
-  assert_equal(Wordize.wordize("kjhskjsh"), "great-azure-dolphin")
-  assert_equal(Wordize.wordize("kjhskjshkjhskjsh"), "smart-green-turtle")
-
-  assert_equal(Wordize.wordize("greatxx-orangexx-pandaxx"), "funny-gray-elephant")
-  assert_equal(Wordize.wordize("greatxx-orangexx-pandayy"), "cute-lemon-horse")
 end

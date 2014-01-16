@@ -4,7 +4,15 @@ task :test => %w(test:etest test:integration)
 namespace :test do
   task :etest do
     require "etest-unit"
-    Tunnel.etest
+    module EmbeddedTests
+      module Etest
+        include Tunnel::Etest
+        include Tunnel::FQDN::Etest
+        include Wordize::Etest
+      end
+    end
+
+    EmbeddedTests.etest
   end
 
   task :integration => "monit:configure" do

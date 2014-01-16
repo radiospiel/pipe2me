@@ -1,6 +1,12 @@
 require "sys"
 require "digest/sha1"
 
+class Tunnel < ActiveRecord::Base
+end
+
+require_relative "tunnel/fqdn"
+require_relative "tunnel/port"
+
 #
 # A Tunnel object models a single tunnel registration. Each tunnel
 # manages a number of ports. These ports are assigned by the server in the
@@ -48,10 +54,8 @@ class Tunnel < ActiveRecord::Base
   before_validation :initialize_defaults
 
   def initialize_defaults
-    require_relative "tunnel/fqdn"
-
     self.token = SecureRandom.random_number(1 << 128).to_s(36) unless token?
-    self.fqdn = FQDN.choose unless fqdn?
+    self.fqdn = FQDN.generate unless fqdn?
   end
 
   # -- tokens -----------------------------------------------------------------
@@ -70,8 +74,6 @@ class Tunnel < ActiveRecord::Base
   end
 
   # -- ports ------------------------------------------------------------------
-
-  require_relative "tunnel/port"
 
   attr :protocols, true
 
