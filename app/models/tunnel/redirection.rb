@@ -1,6 +1,6 @@
 require "cache"
 
-class Subdomain::Redirection
+class Tunnel::Redirection
   def initialize(app)
     @app = app
   end
@@ -8,7 +8,7 @@ class Subdomain::Redirection
   def call(env)
     request = Rack::Request.new env
 
-    if redirect_url = Subdomain::Redirection.url_for(request)
+    if redirect_url = Tunnel::Redirection.url_for(request)
       [ 302, { "Location" => redirect_url }, [] ]
     else
       @app.call env
@@ -16,26 +16,26 @@ class Subdomain::Redirection
   end
 
   @@finder = Cache.new(ttl: 60.seconds) do |host|
-    Subdomain.where(fqdn: host).first
+    Tunnel.where(fqdn: host).first
   end
 
   # build redirection target URL. Note that redirection is not possible
-  # if the subdomain does not provide a https or http scheme.
+  # if the tunnel does not provide a https or http scheme.
   def self.url_for(request)
-    # lookup subdomain.
+    # lookup tunnel.
     host, path_info, query_string = request.host, request.path_info, request.query_string
-    return unless subdomain = @@finder.fetch(request.host)
+    return unless tunnel = @@finder.fetch(request.host)
 
     # build redirection URL. This url is the URL of the public endpoint of
     # the tunnel. All requests that go there will be routed via the (auto)ssh
     # tunnel to the endpoint.
     #
-    # Note that DNS for the domains name (<subdomain>.pipe2.me) resolves to
+    # Note that DNS for the domains name (<tunnel>.pipe2.me) resolves to
     # this server (or else the request wouldn't end up here). It is important
     # to keep the name intact, as any SSL certificate in use on the start
     # point must match the name of the request. As a result the target differs
     # from the request url only by the port number.
-    url = subdomain.urls(:https).first || subdomain.urls(:http).first
+    url = tunnel.urls(:https).first || tunnel.urls(:http).first
     return unless url
 
     url += path_info

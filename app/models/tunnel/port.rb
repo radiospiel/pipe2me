@@ -1,9 +1,9 @@
-class Subdomain::Port < ActiveRecord::Base
-  belongs_to :subdomain
+class Tunnel::Port < ActiveRecord::Base
+  belongs_to :tunnel
 
   validates_inclusion_of  :protocol, :in => %w(http https imap smtp tcp)
 
-  scope :unused, -> { where(subdomain_id: nil) }
+  scope :unused, -> { where(tunnel_id: nil) }
 
   def self.reserve!(n)
     return if unused.count >= n
@@ -20,7 +20,7 @@ class Subdomain::Port < ActiveRecord::Base
   end
 
   def url
-    "#{protocol}://#{subdomain.fqdn}:#{port}"
+    "#{protocol}://#{tunnel.fqdn}:#{port}"
   end
 end
 

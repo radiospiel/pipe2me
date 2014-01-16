@@ -35,11 +35,11 @@ end
 # -- load models --------------------------------------------------------------
 
 require "active_record"
-require "models/subdomain"
+require "models/tunnel"
 
 # -- initialize models --------------------------------------------------------
 
-Subdomain.token_secret = File.secret "var/token_secret"
+Tunnel.token_secret = File.secret "var/token_secret"
 
 # we must load the controllers/base file to make sure that the database
 # is actually connected. Yes, that sounds weird, but this is how

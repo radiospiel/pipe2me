@@ -4,7 +4,7 @@ task :test => %w(test:etest test:integration)
 namespace :test do
   task :etest do
     require "etest-unit"
-    Subdomain.etest
+    Tunnel.etest
   end
 
   task :integration => "monit:configure" do

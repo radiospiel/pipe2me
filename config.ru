@@ -32,10 +32,10 @@ unless Sinatra::Base.development?
   use Rack::CommonLogger
 end
 
-# -- redirect on subdomain name -----------------------------------------------
+# -- redirect on tunnel name --------------------------------------------------
 
-require "models/subdomain/redirection"
-use Subdomain::Redirection
+require "models/tunnel/redirection"
+use Tunnel::Redirection
 
 # -- more rack stuff ----------------------------------------------------------
 
@@ -62,11 +62,11 @@ require "rack/csrf"
 
 require "controllers"
 require "controllers/info"
-require "controllers/subdomains"
+require "controllers/tunnels"
 
 # -- run app ------------------------------------------------------------------
 
 run Rack::URLMap.new(
   "/"               => Controllers::Info.new,
-  "/subdomains"     => Controllers::Subdomains.new
+  "/tunnels"        => Controllers::Tunnels.new
 )

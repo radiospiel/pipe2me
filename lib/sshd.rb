@@ -24,9 +24,9 @@ module SSHD
   #
   # This method rewrites the authorized_keys file.
   def write_authorized_keys
-    subdomains = Subdomain.with_ssh_keys.includes(:ports)
-    authorized_keys = subdomains.
-      map { |subdomain| authorized_key(subdomain) }
+    tunnels = Tunnel.with_ssh_keys.includes(:ports)
+    authorized_keys = tunnels.
+      map { |tunnel| authorized_key(tunnel) }
 
     File.atomic_write path(:authorized_keys), authorized_keys.compact.join("\n")
     STDERR.puts "Created #{path(:authorized_keys)}"
@@ -51,12 +51,12 @@ module SSHD
   #  option,option,option.. pub_key_data name
   #
   # and the options declare which ports may be used for which public key.
-  def authorized_key(subdomain)
-    return unless subdomain.ssh_public_key?
+  def authorized_key(tunnel)
+    return unless tunnel.ssh_public_key?
 
     options = AUTHORIZED_KEY_OPTIONS.grep(/^[^#]/)
-    options += subdomain.ports.map { |port|  "permitopen=\":#{port.port}\"" }
+    options += tunnel.ports.map { |port|  "permitopen=\":#{port.port}\"" }
 
-    "#{options.join(",")} #{subdomain.ssh_public_key}"
+    "#{options.join(",")} #{tunnel.ssh_public_key}"
   end
 end
