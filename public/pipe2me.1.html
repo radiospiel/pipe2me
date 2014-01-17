@@ -60,9 +60,9 @@
     <a href="#OPTIONS">OPTIONS</a>
     <a href="#TUNNEL-SETUP">TUNNEL SETUP</a>
     <a href="#SHOW-TUNNEL-SETTINGS">SHOW TUNNEL SETTINGS</a>
-    <a href="#START-TUNNELS">START TUNNELS</a>
-    <a href="#TEST-TUNNELS">TEST TUNNELS</a>
-    <a href="#EXPORT-STARTUP-SCRIPTS">EXPORT STARTUP SCRIPTS</a>
+    <a href="#MANAGE-TUNNELS-with-monit">MANAGE TUNNELS with monit</a>
+    <a href="#START-TUNNELS-via-foreman-">START TUNNELS (via foreman)</a>
+    <a href="#TEST-TUNNELS-via-foreman-">TEST TUNNELS (via foreman)</a>
     <a href="#BUGS">BUGS</a>
     <a href="#LIMITATIONS">LIMITATIONS</a>
     <a href="#COPYRIGHT">COPYRIGHT</a>
@@ -86,7 +86,8 @@
 <code>pipe2me</code> [ options ] env<br />
 <code>pipe2me</code> [ options ] start<br />
 <code>pipe2me</code> [ options ] echo<br />
-<code>pipe2me</code> [ options ] export [ format ]<br /></p>
+<code>pipe2me</code> [ options ] monit ...<br />
+<code>pipe2me</code> [ options ] monitrc ...<br /></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -105,7 +106,8 @@ domain name) in a single directory. This directory contains these files:</p>
 <li><em>pipe2me.local.inc</em>: settings managed by the client</li>
 <li><em>pipe2me.openssl.cert</em>: openssl certificate</li>
 <li><em>pipe2me.openssl.priv</em>: openssl private key</li>
-<li><em>pipe2me.procfile.tunnels</em>: procfile to run tunnels</li>
+<li><em>pipe2me.procfile</em>: procfile to run tunnels</li>
+<li><em>pipe2me.monitrc</em>: <span class="man-ref">monit<span class="s">(1)</span></span> file to run tunnels</li>
 </ul>
 
 
@@ -152,9 +154,7 @@ local ports, one per protocol</li>
 
 <p><code>pipe2me</code> env<br /></p>
 
-<p>shows the tunnel configuration in the current directory.</p>
-
-<h3 id="EXAMPLES">EXAMPLES</h3>
+<p>shows the tunnel configuration in the current directory. Example:</p>
 
 <pre><code>$ pipe2me env
 ./bin/pipe2me env
@@ -165,46 +165,44 @@ PIPE2ME_URLS_0=https://handsome-snowwhite-hamster.pipe2.dev:10049
 PIPE2ME_TUNNEL=ssh://eno@pipe2.dev:4444
 </code></pre>
 
-<h2 id="START-TUNNELS">START TUNNELS</h2>
+<h2 id="MANAGE-TUNNELS-with-monit">MANAGE TUNNELS with monit</h2>
+
+<p>The pipe2me client package comes with support for the <span class="man-ref">monit<span class="s">(1)</span></span> process manager
+and the <span class="man-ref">daemon<span class="s">(1)</span></span> daemon package. These must be installed on the local machine
+in order to use the following commands.</p>
+
+<p><code>pipe2me</code> monitrc [ --port &lt;control-port&gt; ]<br /></p>
+
+<p>creates a configuration file with commands for all tunnels.</p>
+
+<p><code>pipe2me</code> monit [ arguments ]<br /></p>
+
+<p>recreates the monit configuration file and run monit against that. Note that this
+command is identical to <code>pipe2me monitrc &amp;&amp; monit -c pipe2me.monitrc ...</code> – once
+you created the monitrc control file you could use the latter for faster startup
+times.</p>
+
+<h2 id="START-TUNNELS-via-foreman-">START TUNNELS (via foreman)</h2>
+
+<p>The pipe2me-client comes with support for the foreman process manager. This allows
+you to run tunnels without any non-ruby software. Due to some limitations with the
+foreman software this mode should only be used during development and test - for
+deployment purposes you should use the <span class="man-ref">monit<span class="s">(1)</span></span> process manager (see above).</p>
+
+<p>To start all configured tunnels run</p>
 
 <p><code>pipe2me</code> start<br /></p>
 
-<p>starts all configured tunnels.</p>
+<h2 id="TEST-TUNNELS-via-foreman-">TEST TUNNELS (via foreman)</h2>
 
-<h2 id="TEST-TUNNELS">TEST TUNNELS</h2>
+<p>To help you debug tunnel configurations the pipe2me client comes with a number
+of echo servers. (An echo server is a server which responds with a simple
+string based on the request.) The current version comes with echo support for
+the <em>http</em> and <em>https</em> protocols.</p>
 
-<p><code>pipe2me</code> test<br /></p>
+<p>To start all configured tunnels and echo servers run</p>
 
-<p>starts all configured tunnels and, whereever available, an echo server on
-the local machine. This command is intended for testing.</p>
-
-<p>echo servers are currently supported for these protocols:</p>
-
-<ul>
-<li>http</li>
-<li>https</li>
-</ul>
-
-
-<h2 id="EXPORT-STARTUP-SCRIPTS">EXPORT STARTUP SCRIPTS</h2>
-
-<p><code>pipe2me</code> export [ format ]<br /></p>
-
-<p>exports startup script(s) in a number of supported formats. Startup scripts
-are created in <code>pipe2me.exports.&lt;format></code>.</p>
-
-<p>Currently the
-following formats are supported:</p>
-
-<ul>
-<li>initscript (default): /etc/init.d init scripts</li>
-<li>upstart: Ubuntus upstart daemon manager</li>
-<li>inittab: Linux inittab</li>
-<li>runit: <span class="man-ref">runit<span class="s">(8)</span></span></li>
-</ul>
-
-
-<p>Support for exports is supplied via <a href="http://ddollar.github.io/foreman/">foreman</a>.</p>
+<p><code>pipe2me</code> echo<br /></p>
 
 <h2 id="BUGS">BUGS</h2>
 
@@ -212,6 +210,24 @@ following formats are supported:</p>
 and version of this program - e.g. in bash - would be welcome.</p>
 
 <h2 id="LIMITATIONS">LIMITATIONS</h2>
+
+<h3 id="monitrc-modus">monitrc modus</h3>
+
+<ul>
+<li><p><span class="man-ref">monit<span class="s">(1)</span></span> is configured to use a <strong>control port</strong>, which must be unique on the
+local machine. I would prefer to use a local socket, but AFAIK monit does not
+support that (yet?). In the meantime you must make sure that the control port
+(set via the <em>--port</em> option) is not in use by another process on this machine.
+The default value for the control port is 5555.</p></li>
+<li><p><span class="man-ref">monit<span class="s">(1)</span></span> is configured to log into pipe2me.monit.log. You must make sure that
+this file is rotated on a regular base. See <span class="man-ref">monit<span class="s">(1)</span></span> for details.</p></li>
+</ul>
+
+
+<p><strong>It is strongly recommended to use the created monitrc file as a suggestion and
+to adjust that configuration according to the needs on the local environment.</strong></p>
+
+<h3 id="Automatic-HTTPS-redirections">Automatic HTTPS redirections</h3>
 
 <p>When you create a HTTPS tunnel on a server with a name pinkbunny.pipe2.server, which
 ends up at port 1337, the server redirects all connections that arrive at the HTTPS
@@ -233,7 +249,7 @@ Please see the README.md file for more information.</p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><span class="man-ref">ssh<span class="s">(1)</span></span>, <span class="man-ref">sshd<span class="s">(8)</span></span>, <span class="man-ref">autossh<span class="s">(1)</span></span>, <span class="man-ref">runit<span class="s">(8)</span></span>, <span class="man-ref">inittab<span class="s">(8)</span></span>.</p>
+<p><span class="man-ref">ssh<span class="s">(1)</span></span>, <span class="man-ref">sshd<span class="s">(8)</span></span>, <span class="man-ref">autossh<span class="s">(1)</span></span>, <span class="man-ref">monit<span class="s">(1)</span></span>, <span class="man-ref">foreman<span class="s">(1)</span></span>.</p>
 
 
   <ol class='man-decor man-foot man foot'>
