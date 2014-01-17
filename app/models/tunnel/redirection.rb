@@ -1,5 +1,3 @@
-require "cache"
-
 class Tunnel::Redirection
   def initialize(app)
     @app = app
@@ -15,16 +13,18 @@ class Tunnel::Redirection
     end
   end
 
-  @@finder = Cache.new(ttl: 60.seconds) do |host|
-    Tunnel.where(fqdn: host).first
-  end
-
   # build redirection target URL. Note that redirection is not possible
   # if the tunnel does not provide a https or http scheme.
   def self.url_for(request)
     # lookup tunnel.
+    #
+    # Note: Looking up a tunnel requires a single database request. However,
+    # a typical usage scenarion would involve a single request to a fqdn,
+    # after which the user will be redirected away anyway. So there should
+    # not be many requests to begin with, and then they should appear in long
+    # intervals - so caching seems not to improve things at this time.
     host, path_info, query_string = request.host, request.path_info, request.query_string
-    return unless tunnel = @@finder.fetch(request.host)
+    return unless tunnel = Tunnel.where(fqdn: request.host).first
 
     # build redirection URL. This url is the URL of the public endpoint of
     # the tunnel. All requests that go there will be routed via the (auto)ssh
