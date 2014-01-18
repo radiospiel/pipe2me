@@ -1,5 +1,4 @@
 require "sys"
-require "ui"
 require "ext/file_ext"
 
 module SSHD
