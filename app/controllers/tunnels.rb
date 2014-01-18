@@ -37,14 +37,14 @@ class Controllers::Tunnels < Controllers::Base
 
   post "/:token" do
     protocols = params[:protocols] || "http"
-    tunnel = Tunnel.new protocols: protocols.split(",")
+    tunnel = Tunnel.new protocols: protocols.split(","), token: params[:token]
 
     if tunnel.valid?
       tunnel.save!
       shell public_attributes(tunnel)
     else
       status 403
-      "Not allowed"
+      "Not allowed: #{tunnel.errors.full_messages.join(", ")}"
     end
   end
 
@@ -79,7 +79,7 @@ class Controllers::Tunnels < Controllers::Base
 
   def public_attributes(tunnel)
     {
-      token:            tunnel.id,
+      id:               tunnel.id,
       fqdn:             tunnel.fqdn,
       urls:             tunnel.urls,
       tunnel:           tunnel.tunnel_private_url
