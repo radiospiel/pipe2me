@@ -55,6 +55,17 @@ class Controllers::Tunnels < Controllers::Base
     shell public_attributes(tunnel)
   end
 
+  get "/:id/verify" do
+    tunnel = Tunnel.find(params[:id])
+    if tunnel.online?
+      "#{tunnel.expires_at - Time.now} seconds left."
+      next
+    end
+
+    status 404
+    tunnel ? "tunnel expired" : "!!No such tunnel"
+  end
+
   post "/:id/id_rsa.pub" do
     id_rsa_pub = request.body.read.to_s
     tunnel.add_ssh_key id_rsa_pub
