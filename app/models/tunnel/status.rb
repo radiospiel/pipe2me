@@ -3,7 +3,7 @@ module Tunnel::Status
     other.instance_eval do
       scope :online,  lambda { where "ssh_public_key IS NOT NULL AND expires_at > ?", Time.now }
       scope :offline, lambda { where "ssh_public_key IS NULL OR expires_at <= ?", Time.now }
-
+      scope :ancient, lambda { where "(ssh_public_key IS NULL AND updated_at < ?) OR (expires_at <= ?)", Time.now - 1.week, Time.now - 1.week }
     end
     other.extend ClassMethods
   end

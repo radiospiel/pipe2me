@@ -32,6 +32,7 @@ namespace :run do
       Tunnel.check do
         SSHD.write_authorized_keys
       end
+      Tunnel.ancient.destroy_all
     end
   end
 end
