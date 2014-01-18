@@ -3,6 +3,7 @@ module Tunnel::Token
   SELF = self
 
   TEST_TOKEN = "test@test.kinko.me"
+  SHORT_TOKEN = "short@test.kinko.me"
   REVIEW_TOKEN = "review@test.kinko.me"
 
   def self.included(base)
@@ -41,6 +42,8 @@ module Tunnel::Token
     case token
     when TEST_TOKEN
       { :max_ports => 6, :period => 3.minutes, :extend => false }
+    when SHORT_TOKEN
+      { :max_ports => 6, :period => 3.seconds, :extend => false }
     when REVIEW_TOKEN
       { :max_ports => 6, :period => 1.day, :extend => false }
     else
