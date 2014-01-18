@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
 module Wordize
-  def self.wordize
-    i32 = rand(0xffffffff)
-
+  def self.wordize(i32)
     parts = [MOODS, COLORS, ANIMALS].map do |words|
       # get remainder for table in this round.
       idx = i32 % words.length
@@ -92,8 +90,8 @@ end
 
 module Wordize::Etest
   def test_wordize_rnd
-    w1 = Wordize.wordize
-    w2 = Wordize.wordize
+    w1 = Wordize.wordize(100000)
+    w2 = Wordize.wordize(100001)
 
     assert w1 =~ /[a-z]+-[a-z]+-[a-z]+/
     assert w2 =~ /[a-z]+-[a-z]+-[a-z]+/

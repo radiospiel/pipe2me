@@ -54,23 +54,11 @@ class Tunnel < ActiveRecord::Base
   before_validation :initialize_defaults
 
   def initialize_defaults
-    self.token = SecureRandom.random_number(1 << 128).to_s(36) unless token?
-    self.fqdn = FQDN.generate unless fqdn?
-  end
+    # randomly choose ID
+    self.id = SecureRandom.random_number(1 << 63) unless id?
 
-  # -- tokens -----------------------------------------------------------------
-
-  (class << self; self; end).instance_eval do
-    attr :token_secret, true
-  end
-
-  def self.encrypt_token(cleartext)
-    raise "Missing #{SELF}.token_secret" unless token_secret
-    Digest::SHA1.hexdigest("#{token_secret}-#{cleartext}")
-  end
-
-  def token=(token)
-    super SELF.encrypt_token(token)
+    # generate fqdn from id
+    self.fqdn = FQDN.generate(self.id) unless fqdn?
   end
 
   # -- ports ------------------------------------------------------------------
@@ -160,21 +148,5 @@ module Tunnel::Etest
 
     url_protocols = tunnel.urls.map { |url| URI.parse(url).scheme }
     assert_equal(url_protocols, %w(http https) )
-  end
-
-  def test_token_encryption
-    # make sure no two tokens encrypt to the same
-    assert_not_equal Tunnel.encrypt_token("foo"), Tunnel.encrypt_token("bar")
-    assert_not_equal Tunnel.encrypt_token("foo"), "foo"
-  end
-
-  def test_token_is_stored_encrypted
-    tunnel = self.tunnel protocols: %w(http https), token: "token"
-
-    encrypted_token = tunnel.token
-    assert_not_equal encrypted_token, "token"
-
-    assert_equal tunnel, Tunnel.where(token: encrypted_token).first
-    assert_nil Tunnel.where(token: "token").first
   end
 end

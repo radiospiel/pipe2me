@@ -23,7 +23,7 @@ class Controllers::Tunnels < Controllers::Base
 
   def index
     tunnels = Tunnel.all
-    shell tunnels: tunnels.map(&:token)
+    shell tunnels: tunnels.map(&:id)
   end
 
   # -- return the root certificate --------------------------------------------
@@ -35,11 +35,12 @@ class Controllers::Tunnels < Controllers::Base
 
   # -- create: create a new tunnel -----------------------------------------
 
-  post "/:auth" do
-    case auth = params[:auth]
-    when "test@test.kinko.me", "review@test.kinko.me"
-      protocols = params[:protocols] || "http"
-      tunnel = Tunnel.create! protocols: protocols.split(",")
+  post "/:token" do
+    protocols = params[:protocols] || "http"
+    tunnel = Tunnel.new protocols: protocols.split(",")
+
+    if tunnel.valid?
+      tunnel.save!
       shell public_attributes(tunnel)
     else
       status 403
@@ -50,21 +51,21 @@ class Controllers::Tunnels < Controllers::Base
   # -- show: get an individual tunnel --------------------------------------
 
   # return the token configuration
-  get "/:token" do
+  get "/:id" do
     shell public_attributes(tunnel)
   end
 
-  post "/:token/id_rsa.pub" do
+  post "/:id/id_rsa.pub" do
     id_rsa_pub = request.body.read.to_s
     tunnel.add_ssh_key id_rsa_pub
     "OK"
   end
 
-  get "/:token/cert.pem" do
+  get "/:id/cert.pem" do
     tunnel.openssl_certificate
   end
 
-  post "/:token/cert.pem" do
+  post "/:id/cert.pem" do
     csr = request.body.read.to_s
     tunnel.openssl_sign_certificate! csr
     tunnel.openssl_certificate
@@ -73,13 +74,12 @@ class Controllers::Tunnels < Controllers::Base
   private
 
   def tunnel
-    @tunnel ||= (params[:token] && Tunnel.where(token: params[:token]).first) ||
-      Tunnel.find(params[:token])
+    @tunnel ||= Tunnel.find(params[:id])
   end
 
   def public_attributes(tunnel)
     {
-      token:            tunnel.token,
+      token:            tunnel.id,
       fqdn:             tunnel.fqdn,
       urls:             tunnel.urls,
       tunnel:           tunnel.tunnel_private_url
