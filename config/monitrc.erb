@@ -1,12 +1,28 @@
-<% DAEMON = `which daemon`.chomp %>
+<%
+  def which(name)
+    `which #{name}`.chomp
+  end
+
+  def log(process)
+    # "#{ROOT}/var/log/#{process}.log"
+    "#{ROOT}/var/log/pipe2me.log"
+  end
+
+  bundle = "#{ROOT}/script/bundle"
+  var = "#{ROOT}/var"
+%>
 
 set daemon 10
 set httpd port 5500 and use address localhost allow localhost
 
-<% Procfile.each("Procfile") do |group, name, cmd, port| %>
-check process <%= name %> with pidfile <%= PIDDIR %>/<%= name %>.pid
-  <% daemon = "#{DAEMON} -N --name #{name} --pidfiles #{PIDDIR} --output #{LOGDIR}/#{group}.log" %>
-  start program = "<%= daemon %> -- env PORT=<%= port %> <%= BUNDLE %> exec <%= cmd %>" with timeout 60 seconds
-  stop program = "<%= daemon %> --stop"
-  group <%= group %>
-<% end %>
+check process web with pidfile <%= var %>/pids/web.pid
+  start program = "<%= which :daemon %> -N --name web --pidfiles <%= var %>/pids --output <%= log :web %> -- <%= bundle %> exec puma -b unix:<%= var %>/web.sock" with timeout 60 seconds
+  stop program = "<%= which :daemon %> -N --name web --pidfiles <%= var %>/pids --output <%= log :web %> --stop"
+
+check process sshd with pidfile <%= var %>/pids/sshd.pid
+  start program = "<%= which :daemon %> -N --name sshd --pidfiles <%= var %>/pids --output <%= log :sshd %> -- <%= which :sshd %> -D -e -f <%= var %>/config/sshd.conf" with timeout 60 seconds
+  stop program = "<%= which :daemon %> -N --name sshd --pidfiles <%= var %>/pids --output <%= log :sshd %> --stop"
+
+check process nginx with pidfile <%= var %>/pids/nginx.pid
+  start program = "<%= which :daemon %> -N --name nginx --pidfiles <%= var %>/pids --output <%= log :nginx %> -- <%= which :nginx %> -c <%= var %>/config/nginx.conf " with timeout 60 seconds
+  stop program = "<%= which :daemon %> -N --name nginx --pidfiles <%= var %>/pids --output <%= log :nginx %> --stop"

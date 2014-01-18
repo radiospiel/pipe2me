@@ -1,7 +1,6 @@
 namespace :monit do
   desc "Create monitrc file"
   task :configure do
-    require_relative "procfile"
     require_relative "erb_ext"
 
     PIDDIR = "#{ROOT}/var/pids"
