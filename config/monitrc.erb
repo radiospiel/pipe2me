@@ -27,9 +27,18 @@ check process checker with pidfile <%= var %>/pids/checker.pid
   start program = "<%= daemon %> -N --name checker --pidfiles <%= var %>/pids --output <%= log :checker %> -- <%= bundle %> exec rake run:check" with timeout 60 seconds
   stop program = "<%= daemon %> -N --name checker --pidfiles <%= var %>/pids --output <%= log :checker %> --stop"
 
+# sshd is not started by daemon. daemon(1) stops processes by sending SIGTERMs.
+# When receiving SIGTERMs sshd, however, only terminates when there are no more
+# connections.
+#
+# While we need to terminate running connections by other means, we at least want
+# the master process to stop - which means we want to SIGKILL it.
+#
+# [todo] terminate connections
+# [bug] sshd logging
 check process sshd with pidfile <%= var %>/pids/sshd.pid
-  start program = "<%= daemon %> -N --name sshd --pidfiles <%= var %>/pids --output <%= log :sshd %> -- <%= sshd %> -D -e -f <%= var %>/config/sshd.conf" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name sshd --pidfiles <%= var %>/pids --output <%= log :sshd %> --stop"
+  start program = "<%= sshd %> -e -f <%= var %>/config/sshd.conf -o PidFile=<%= var %>/pids/sshd.pid" with timeout 60 seconds
+  stop program = "/bin/sh -c 'kill -9 $(cat <%= var %>/pids/sshd.pid)'"
 
 check process nginx with pidfile <%= var %>/pids/nginx.pid
   start program = "<%= daemon %> -N --name nginx --pidfiles <%= var %>/pids --output <%= log :nginx %> -- <%= nginx %> -c <%= var %>/config/nginx.conf " with timeout 60 seconds
