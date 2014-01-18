@@ -6,6 +6,7 @@ end
 
 require_relative "tunnel/fqdn"
 require_relative "tunnel/port"
+load "#{File.dirname(__FILE__)}/tunnel/token.rb"
 
 #
 # A Tunnel object models a single tunnel registration. Each tunnel
@@ -36,6 +37,9 @@ require_relative "tunnel/port"
 #
 class Tunnel < ActiveRecord::Base
   SELF = self
+
+  # -- include token code -----------------------------------------------------
+  include Token
 
   # -- name and port are readonly, once chosen, and are set automatically -----
 
@@ -133,6 +137,8 @@ end
 
 module Tunnel::Etest
   def tunnel(options = {})
+    options[:token] = Tunnel::TEST_TOKEN unless options.key?(:token)
+
     tunnel = Tunnel.create! options
     Tunnel.find(tunnel.id)
   end

@@ -32,3 +32,7 @@ gem "foreman"
 # -- misc. --------------------------------------------------------------------
 
 gem "simple-ui"
+
+group :development do
+  gem "timecop"
+end

@@ -32,6 +32,8 @@ Dir.glob("#{ROOT}/config/initializers/*.rb").sort.each do |file|
   load file
 end
 
+require "simple/ui"
+
 # -- load models --------------------------------------------------------------
 
 require "active_record"

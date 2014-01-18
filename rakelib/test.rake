@@ -8,9 +8,12 @@ namespace :test do
       module Etest
         include Tunnel::Etest
         include Tunnel::FQDN::Etest
+        include Tunnel::Token::Etest
         include Wordize::Etest
       end
     end
+
+    ActiveRecord::Base.logger.level = Logger::INFO
 
     EmbeddedTests.etest
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 3) do
+ActiveRecord::Schema.define(version: 4) do
 
   create_table "tunnel_ports", force: true do |t|
     t.integer  "port"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 3) do
     t.text     "openssl_certificate"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "expires_at"
   end
 
   add_index "tunnels", ["fqdn"], name: "index_tunnels_on_fqdn", unique: true
