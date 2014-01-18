@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 4) do
+ActiveRecord::Schema.define(version: 5) do
 
   create_table "tunnel_ports", force: true do |t|
     t.integer  "port"
@@ -32,8 +32,10 @@ ActiveRecord::Schema.define(version: 4) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "expires_at"
+    t.string   "status",              default: "", null: false
   end
 
   add_index "tunnels", ["fqdn"], name: "index_tunnels_on_fqdn", unique: true
+  add_index "tunnels", ["status"], name: "index_tunnels_on_status"
 
 end

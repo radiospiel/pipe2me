@@ -6,7 +6,8 @@ end
 
 require_relative "tunnel/fqdn"
 require_relative "tunnel/port"
-load "#{File.dirname(__FILE__)}/tunnel/token.rb"
+require_relative "tunnel/token"
+require_relative "tunnel/status"
 
 #
 # A Tunnel object models a single tunnel registration. Each tunnel
@@ -38,8 +39,9 @@ load "#{File.dirname(__FILE__)}/tunnel/token.rb"
 class Tunnel < ActiveRecord::Base
   SELF = self
 
-  # -- include token code -----------------------------------------------------
-  include Token
+  # -- include modules --------------------------------------------------------
+
+  include Token, Status
 
   # -- name and port are readonly, once chosen, and are set automatically -----
 
@@ -125,9 +127,6 @@ class Tunnel < ActiveRecord::Base
   end
 
   # -- SSH keys ---------------------------------------------------------------
-
-  scope :with_ssh_keys, -> { where "ssh_public_key IS NOT NULL " }
-  scope :without_ssh_keys, -> { where "ssh_public_key IS NULL " }
 
   def add_ssh_key(ssh_public_key)
     update_attributes! :ssh_public_key => ssh_public_key

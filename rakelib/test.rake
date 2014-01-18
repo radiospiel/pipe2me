@@ -13,6 +13,7 @@ namespace :test do
         include Tunnel::Etest
         include Tunnel::FQDN::Etest
         include Tunnel::Token::Etest
+        include Tunnel::Status::Etest
         include Wordize::Etest
       end
     end

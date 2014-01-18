@@ -44,12 +44,6 @@ module Tunnel::Token
       { :invalid => true }
     end
   end
-
-  public
-
-  def online?
-    expires_at > Time.now
-  end
 end
 
 module Tunnel::Token::Etest
@@ -64,7 +58,9 @@ module Tunnel::Token::Etest
   def test_test_token_goes_offline
     require "timecop"
 
-    tunnel = self.tunnel protocols: %w(http)
+    # A tunnel is online only if a ssh_public_key is set. For this test
+    # a fake value will do.
+    tunnel = self.tunnel protocols: %w(http), ssh_public_key: "fake_ssh_public_key"
     assert_equal true, tunnel.online?
 
     Timecop.travel 5.minutes do

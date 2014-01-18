@@ -23,7 +23,7 @@ module SSHD
   #
   # This method rewrites the authorized_keys file.
   def write_authorized_keys
-    tunnels = Tunnel.with_ssh_keys.includes(:ports)
+    tunnels = Tunnel.online.includes(:ports)
     authorized_keys = tunnels.
       map { |tunnel| authorized_key(tunnel) }
 
