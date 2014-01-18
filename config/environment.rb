@@ -37,6 +37,8 @@ require "simple/ui"
 # -- load models --------------------------------------------------------------
 
 require "active_record"
+I18n.enforce_available_locales = false
+
 require "models/tunnel"
 
 # -- initialize models --------------------------------------------------------
