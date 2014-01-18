@@ -22,3 +22,16 @@ task :configure => "sshd:configure"
 task :configure => "monit:configure"
 
 task :default => "test"
+
+namespace :run do
+  task :check do
+    ActiveRecord::Base.logger.level = Logger::INFO
+    while true do
+      sleep 5
+      UI.success "check"
+      Tunnel.check do
+        SSHD.write_authorized_keys
+      end
+    end
+  end
+end
