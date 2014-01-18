@@ -12,6 +12,9 @@ module Tunnel::Token
 
   # Apply the new token
   def apply_token
+    return if @applied_token
+    @applied_token = true
+
     return if !new_record? && !token_changed?
 
     SELF.parse(token).each do |key, value|
