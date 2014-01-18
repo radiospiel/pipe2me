@@ -7,7 +7,7 @@ module Tunnel::Token
 
   def self.included(base)
     base.before_validation :apply_token
-    base.validates_presence_of :expires_at
+    base.validates_presence_of :expires_at, :unless => :invalid_token?
   end
 
   # Apply the new token
@@ -17,7 +17,7 @@ module Tunnel::Token
     SELF.parse(token).each do |key, value|
       case key
       when :invalid
-        errors.add(:token, "Invalid or missing token")
+        errors.add(:token, "Invalid or missing token: #{token.inspect}")
       when :max_ports
         errors.add(:ports, "Too many ports") unless ports.count <= value
       when :extend
@@ -29,6 +29,10 @@ module Tunnel::Token
   end
 
   private
+
+  def invalid_token?
+    errors.has_key?(:token)
+  end
 
   def self.parse(token)
     case token
