@@ -7,3 +7,4 @@ server.old
 monitrc
 config/nginx.conf
 .bundle/
+coverage

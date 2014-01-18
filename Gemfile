@@ -35,4 +35,5 @@ gem "simple-ui"
 
 group :development do
   gem "timecop"
+  gem "simplecov"
 end

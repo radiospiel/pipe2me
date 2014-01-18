@@ -1,6 +1,10 @@
 desc "Run tests"
 task :test => %w(test:etest test:integration)
 
+task :etest do
+  system "env SIMPLE_COV=1 rake test:etest"
+end
+
 namespace :test do
   task :etest do
     require "etest-unit"
@@ -14,7 +18,6 @@ namespace :test do
     end
 
     ActiveRecord::Base.logger.level = Logger::INFO
-
     EmbeddedTests.etest
   end
 
