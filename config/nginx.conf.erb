@@ -45,7 +45,7 @@ http {
     listen <%= HTTP_PORT %>;
     include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>
-    include nginx/pipe2me.conf;
+    include nginx/monit.conf;
     <% end %>
   }
   <% end %>
@@ -59,7 +59,7 @@ http {
     ssl_certificate_key  <%= VAR %>/openssl/private/localhost.pem;
     # keepalive_timeout    70;
     #
-    include nginx/server.conf;
+    include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>
     include nginx/monit.conf;
     <% end %>
