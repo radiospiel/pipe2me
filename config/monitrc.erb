@@ -1,7 +1,9 @@
 <%
   def which(*names)
     names.map do |name|
-      `which #{name}`.chomp
+      path = `which #{name}`.chomp
+      raise "Missing #{name}" if path == ""
+      path
     end
   end
 

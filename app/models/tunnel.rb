@@ -132,6 +132,12 @@ class Tunnel < ActiveRecord::Base
     update_attributes! :ssh_public_key => ssh_public_key
     SSHD.write_authorized_keys
   end
+
+  def kill_connections
+    # find all sshd instances for the ports of this connection
+    # pids = [1,2,3]
+
+  end
 end
 
 module Tunnel::Etest

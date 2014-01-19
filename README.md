@@ -27,8 +27,6 @@ accessibility from consumers in other locations.
 
 ## pipe2me server
 
-The pipe2me server lives in the `-/api` subdirectory.
-
 ### Prerequisites
 
 pipe2me is developed under MRI ruby version 2.0 on Debian. Other rubies and
@@ -59,8 +57,8 @@ To download and install the server software:
     cd pipe2me
 
     # prepare server
-    cd api
     bundle install
+    sudo bundle exec rake install
 
     # the var subdirectory contains runtime information, and should
     # be stored outside of the main directory. It should be kept in
@@ -250,47 +248,52 @@ Please install the git trimWhitespace tool from [https://github.com/radiospiel/g
 
 ### Running tests
 
-    cd api
+The server comes with tests of its own. To run tests, you must, of course configure
+and setup this package:
+
+    # setup the server software
     bundle install
-    cd ..
-    cd client/ruby
-    bundle install
-    cd ../..
-    cd test
-    ./run
+    bundle exec rake configure
+    bundle exec rake install:dependencies
 
-### Contributing & Licensing
+and then run the tests via rake:
 
-#### server software licensing
+    # run the server tests
+    bundle exec rake test
 
-**The pipe2me server software** is released to you under the terms of the
-"GNU Affero General Public License, version 3". (See the file COPYING.AGPL for details).
-That means you are free to use, modify, ad redistribute the software **under some conditions**
-that are laid out in the license. In short, you cannot redistribute the software to
-someone else without giving them the same rights to your modifications that we gave you to our
-codebase. It also means that you cannot run a modified version of the pipe2me server
-software without letting your user access your modifications under the same terms.
+You should also run the tests in the pipe2me-client package. See there for more details.
+
+
+### Contributing
+
+### Licensing
+
+This software is released to you under the terms of the "GNU Affero General
+Public License, version 3". (See the file COPYING.AGPL for details). That
+means you are free to use, modify, ad redistribute the software **under
+some conditions** that are laid out in the license. In short, you cannot
+redistribute the software to someone else without giving them the same
+rights to your modifications that we gave you to our codebase.
+It also means that you cannot run a modified version of the pipe2me server
+software without granting access to your modifications under the same terms
+to the users of your service.
 
 For more details see the file COPYING.APL, for a more thorough discussion compare [http://en.wikipedia.org/wiki/Affero_General_Public_License](http://en.wikipedia.org/wiki/Affero_General_Public_License).
 
-This affects all code in the `./api` subtree, unless otherwise stated in the the respective files.
+This affects all code in this repository, with the notable exception of 3rd party code,
+which could live in the `./vendor` directory.
 
-#### client software licensing
+#### Licensing issues with your contributions
 
-**The pipe2me client software** is released to you under the terms of the MIT License (MIT), see
-COPYING.MIT for details.
+However, licensing is a slightly different matter if you want to
+contribute back to the project.
 
-This affects all code not in the `./api` subtree, unless otherwise stated in the respective files.
-
-#### Contributing
-
-However, licensing is a slightly different matter if you want to contribute back to the project.
-
-Because we don't know yet if we stick to the AGPL license for the future, we need you to
-give us the right to relicense your modifications without having to ask you. If you submit
-a pull request please make sure that you agree to that terms, or else we cannot merge your
-changes back into the main codebase. This sounds complicated, but note that you could
-(and probably should) license your contributions under the terms of the MIT License.
+Because we don't know yet if we stick to the AGPL license for the future,
+we need you to give us the right to relicense your modifications without having
+to ask you. If you submit a pull request please make sure that you agree to that,
+or else we cannot merge your changes back into the main codebase. This sounds
+complicated, but really is not: you could (and probably should) license your
+contributions under the terms of the MIT License.
 
 If you feel unsure about this feel free to discuss this issue with us.
 
