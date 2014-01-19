@@ -5,12 +5,6 @@ VERSION = "0.1.0"
 # any settings in an explicitely stated configuration file. Therefore we cannot
 # use .env AND have a specific configuration file. We use ruby plain instead.
 
-begin
-  config = File.expand_path("~/pipe2me.server.conf")
-  load config if File.exists?(config)
-end
-load "config/defaults.rb"
-
 # -- path settings ------------------------------------------------------------
 
 ROOT=File.expand_path "#{File.dirname(__FILE__)}/../"
@@ -28,11 +22,11 @@ $: << "#{ROOT}/lib"
 
 # -- load initializers --------------------------------------------------------
 
+require "simple/ui"
+
 Dir.glob("#{ROOT}/config/initializers/*.rb").sort.each do |file|
   load file
 end
-
-require "simple/ui"
 
 # -- load models --------------------------------------------------------------
 
