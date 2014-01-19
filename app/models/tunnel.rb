@@ -117,7 +117,7 @@ class Tunnel < ActiveRecord::Base
     tmpfile.close
 
     Sys.sys! "#{ROOT}/ca/sign-certificate", fqdn, tmpfile.path
-    openssl_certificate = File.read "#{ROOT}/var/openssl/certs/#{fqdn}.pem"
+    openssl_certificate = File.read "#{VAR}/openssl/certs/#{fqdn}.pem"
     update_attributes! :openssl_certificate => openssl_certificate
 
     tmpfile.unlink                            # deletes the temp file

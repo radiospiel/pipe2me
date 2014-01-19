@@ -1,9 +1,7 @@
 # The pipe2me version number.
 VERSION = "0.1.0"
 
-# Note: there is an issue with Dotenv, where an existing .env file overrides
-# any settings in an explicitely stated configuration file. Therefore we cannot
-# use .env AND have a specific configuration file. We use ruby plain instead.
+require "simple/ui"
 
 # -- path settings ------------------------------------------------------------
 
@@ -16,13 +14,21 @@ else
   VAR=File.join "#{ROOT}/var"
 end
 
+# -- does VAR exist? ----------------------------------------------------------
+
+unless File.exists?(VAR)
+  system "mkdir -p ~/pipe2me.#{File.basename VAR}"
+  system "ln -sf ~/pipe2me.#{File.basename VAR} #{File.basename VAR}"
+  UI.success "Created and linked ~/pipe2me.#{File.basename VAR}"
+end
+
+# -- set ruby search path -----------------------------------------------------
+
 $: << "#{ROOT}/app"
 $: << "#{ROOT}/app/models"
 $: << "#{ROOT}/lib"
 
 # -- load initializers --------------------------------------------------------
-
-require "simple/ui"
 
 Dir.glob("#{ROOT}/config/initializers/*.rb").sort.each do |file|
   load file

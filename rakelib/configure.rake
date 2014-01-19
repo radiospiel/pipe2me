@@ -16,15 +16,7 @@ namespace :configure do
   end
 
   # desc "Create needed directories"
-  task :directories => VAR
   task :directories => "#{VAR}/config"
-
-  directory VAR do
-    system "mkdir -p ~/pipe2me.#{File.basename VAR}"
-    system "ln -sf ~/pipe2me.#{File.basename VAR} #{File.basename VAR}"
-    UI.success "Created and linked ~/pipe2me.#{File.basename VAR}"
-  end
-
   directory "#{VAR}/config" do
     FileUtils.mkdir "#{VAR}/config"
   end

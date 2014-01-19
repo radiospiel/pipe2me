@@ -10,24 +10,23 @@
   daemon, sshd, nginx = which :daemon, :sshd, :nginx
 
   def log(process)
-    # "#{ROOT}/var/log/#{process}.log"
-    "#{ROOT}/var/log/pipe2me.log"
+    process = "pipe2me"
+    "#{VAR}/log/#{process}.log"
   end
 
   bundle = "#{ROOT}/script/bundle"
-  var = "#{ROOT}/var"
 %>
 
 set daemon 10
 set httpd port <%= MONIT_PORT %> and use address localhost allow localhost
 
-check process web with pidfile <%= var %>/pids/web.pid
-  start program = "<%= daemon %> -N --name web --pidfiles <%= var %>/pids --output <%= log :web %> -- <%= bundle %> exec puma -b unix:<%= var %>/web.sock" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name web --pidfiles <%= var %>/pids --output <%= log :web %> --stop"
+check process web with pidfile <%= VAR %>/pids/web.pid
+  start program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --output <%= log :web %> -- <%= bundle %> exec puma -b unix:<%= VAR %>/web.sock" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --output <%= log :web %> --stop"
 
-check process checker with pidfile <%= var %>/pids/checker.pid
-  start program = "<%= daemon %> -N --name checker --pidfiles <%= var %>/pids --output <%= log :checker %> -- <%= bundle %> exec rake run:check" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name checker --pidfiles <%= var %>/pids --output <%= log :checker %> --stop"
+check process checker with pidfile <%= VAR %>/pids/checker.pid
+  start program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --output <%= log :checker %> -- <%= bundle %> exec rake run:check" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --output <%= log :checker %> --stop"
 
 # sshd is not started by daemon. daemon(1) stops processes by sending SIGTERMs.
 # When receiving SIGTERMs sshd, however, only terminates when there are no more
@@ -38,10 +37,10 @@ check process checker with pidfile <%= var %>/pids/checker.pid
 #
 # [todo] terminate connections
 # [bug] sshd logging
-check process sshd with pidfile <%= var %>/pids/sshd.pid
-  start program = "<%= sshd %> -e -f <%= var %>/config/sshd.conf -o PidFile=<%= var %>/pids/sshd.pid" with timeout 60 seconds
-  stop program = "/bin/sh -c 'kill -9 $(cat <%= var %>/pids/sshd.pid)'"
+check process sshd with pidfile <%= VAR %>/pids/sshd.pid
+  start program = "<%= sshd %> -e -f <%= VAR %>/config/sshd.conf -o PidFile=<%= VAR %>/pids/sshd.pid" with timeout 60 seconds
+  stop program = "/bin/sh -c 'kill -9 $(cat <%= VAR %>/pids/sshd.pid)'"
 
-check process nginx with pidfile <%= var %>/pids/nginx.pid
-  start program = "<%= daemon %> -N --name nginx --pidfiles <%= var %>/pids --output <%= log :nginx %> -- <%= nginx %> -c <%= var %>/config/nginx.conf " with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name nginx --pidfiles <%= var %>/pids --output <%= log :nginx %> --stop"
+check process nginx with pidfile <%= VAR %>/pids/nginx.pid
+  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> -- <%= nginx %> -c <%= VAR %>/config/nginx.conf " with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> --stop"
