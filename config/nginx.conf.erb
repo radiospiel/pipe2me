@@ -41,8 +41,12 @@ http {
   <% if HTTP_PORT %>
   server {
     set $root <%= ROOT %>;
+    set $monit_port <%= MONIT_PORT %>;
     listen <%= HTTP_PORT %>;
-    include nginx/server.conf;
+    include nginx/pipe2me.conf;
+    <% if MONIT_PUBLIC_ACCESS %>
+    include nginx/pipe2me.conf;
+    <% end %>
   }
   <% end %>
 	
@@ -56,6 +60,9 @@ http {
     # keepalive_timeout    70;
     #
     include nginx/server.conf;
+    <% if MONIT_PUBLIC_ACCESS %>
+    include nginx/monit.conf;
+    <% end %>
   }
   <% end %>
 }

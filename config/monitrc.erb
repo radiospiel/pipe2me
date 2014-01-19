@@ -19,7 +19,7 @@
 %>
 
 set daemon 10
-set httpd port 5500 and use address localhost allow localhost
+set httpd port <%= MONIT_PORT %> and use address localhost allow localhost
 
 check process web with pidfile <%= var %>/pids/web.pid
   start program = "<%= daemon %> -N --name web --pidfiles <%= var %>/pids --output <%= log :web %> -- <%= bundle %> exec puma -b unix:<%= var %>/web.sock" with timeout 60 seconds
