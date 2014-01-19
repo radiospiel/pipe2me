@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
-
 # ./script/issue This will be the issue title @radiospiel \#high
+
+require "shellwords"
+
 
 message = ARGV.join(" ")
 
@@ -16,15 +18,16 @@ if message == ""
   exit 1
 end
 
-cmd = [ "ghi", "open", "-m", message ]
+cmd = [ "ghi", "open", "-m", message.shellescape ]
 cmd += [ "-u", users.join(",") ] unless users.empty?
 cmd += [ "-L", labels.join(",") ] unless labels.empty?
+cmd = cmd.join(" ")
 
 begin
-  puts cmd.join(" ")  
+  puts cmd
   puts "Continue? (return or ^C)"
   STDIN.gets
-  Kernel.exec "ghi", "open", "-m", message, "-u", users.join(","), "-L", labels.join(",")
+  system cmd
 rescue Interrupt
   exit 1
 end
