@@ -1,6 +1,4 @@
 #!/bin/bash
-echo `date` running "$0" "$*" >> /tmp/start0
-echo "$*" >> /tmp/start0
 
 # fix environment
 
