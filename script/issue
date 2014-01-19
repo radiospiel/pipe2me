@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+# ./script/issue This will be the issue title @radiospiel \#high
+
+message = ARGV.join(" ")
+
+users, labels = [], []
+message.gsub!(/\s([@#])([a-zA-Z0-9]*)\b/) do
+  ($1 == "@" ? users : labels) << $2
+  " "
+end
+message.gsub! /\s+/, " "
+
+if message == ""
+  STDERR.puts "Missing issue title"
+  exit 1
+end
+
+cmd = [ "ghi", "open", "-m", message ]
+cmd += [ "-u", users.join(",") ] unless users.empty?
+cmd += [ "-L", labels.join(",") ] unless labels.empty?
+
+begin
+  puts cmd.join(" ")  
+  puts "Continue? (return or ^C)"
+  STDIN.gets
+  Kernel.exec "ghi", "open", "-m", message, "-u", users.join(","), "-L", labels.join(",")
+rescue Interrupt
+  exit 1
+end
