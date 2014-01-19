@@ -1,2 +1,19 @@
-TUNNEL_DOMAIN = "pipe2.dev"   unless defined?(TUNNEL_DOMAIN)
-TUNNEL_PORTS = 10000...40000  unless defined?(TUNNEL_PORTS)
+# The fqdn for the pipe2me server. The DNS for this fqdn must point to this
+# machine.
+#
+# For local development we recommend it to set this to "pipe2.dev" and, if needed,
+# to add an entry in /etc/hosts which makes pipe2.dev point to 127.0.0.1. 
+TUNNEL_DOMAIN = "pipe2.dev"
+
+# The ports for tunnel endpoints
+TUNNEL_PORTS = 10000...20000
+
+# Set port for HTTP connection. Set this to false if the server should not accept 
+# HTTP connections.
+HTTP_PORT  = 8080
+
+# Set port for HTTPS connection.
+HTTPS_PORT = 8443
+
+# Set port for SSHD connection from pipe2me clients.
+SSHD_PORT = 8444

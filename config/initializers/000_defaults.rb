@@ -1,6 +1,7 @@
 if File.exists?("#{VAR}/server.conf")
   load "#{VAR}/server.conf"
 else
-  TUNNEL_DOMAIN = "pipe2.dev"
-  TUNNEL_PORTS = 10000...40000
+  UI.warn "Loading sample configuration"
+  load "#{ROOT}/config/server.conf.example"
+  UI.error "Note: make sure to create and edit a custom configuration in #{VAR}/server.conf, by running 'rake configure'"
 end

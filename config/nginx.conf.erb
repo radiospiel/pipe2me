@@ -38,15 +38,18 @@ http {
     server unix:<%= VAR %>/web.sock;
   }
 
+  <% if HTTP_PORT %>
   server {
     set $root <%= ROOT %>;
-    listen 8080;
+    listen <%= HTTP_PORT %>;
     include nginx/server.conf;
   }
+  <% end %>
 	
+  <% if HTTPS_PORT %>
   server {
     set $root <%= ROOT %>;
-    listen               8443;
+    listen               <%= HTTPS_PORT %>;
     ssl                  on;
     ssl_certificate      <%= VAR %>/openssl/certs/localhost.pem;
     ssl_certificate_key  <%= VAR %>/openssl/private/localhost.pem;
@@ -54,4 +57,5 @@ http {
     #
     include nginx/server.conf;
   }
+  <% end %>
 }
