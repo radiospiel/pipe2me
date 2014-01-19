@@ -10,8 +10,8 @@ namespace :monit do
     FileUtils.mkdir_p LOGDIR
 
     ERB.process "config/monitrc.erb" => "var/config/monitrc"
-    Sys.sys! "monit", "-t", "var/config/monitrc"
     FileUtils.chmod 0600, "var/config/monitrc"
+    Sys.sys! "monit", "-c", "var/config/monitrc", "-t"
     FileUtils.ln_sf "var/config/monitrc", "monitrc"
   end
 end
