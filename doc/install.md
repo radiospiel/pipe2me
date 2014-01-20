@@ -6,7 +6,7 @@
 - Have ruby version 2, git, monit, daemon, nginx installed
 - Run these:
 
-        git clone
+        git clone https://github.com/kinkome/pipe2me.git
         cd pipe2me
         bundle install
         rake configure
