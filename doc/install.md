@@ -6,14 +6,14 @@
 - Have ruby version 2, git, monit, daemon, nginx installed
 - Run these:
 
-    git clone
-    cd pipe2me
-    bundle install
-    rake configure
-    # edit var/server.conf, at least change TUNNEL_HOST
-    rake configure
-    monit -c monitrc
-    monit -c monitrc start all
+        git clone
+        cd pipe2me
+        bundle install
+        rake configure
+        # edit var/server.conf, at least change TUNNEL_HOST
+        rake configure
+        monit -c monitrc
+        monit -c monitrc start all
 
 ### Add a user for the pipe2me server
 
