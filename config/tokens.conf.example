@@ -1,0 +1,20 @@
+# == The token configuration file =============================================
+#
+# Each token is one line, with this format
+#
+# name=max_ports:6 lifespan:180 extend:false unique:true
+#
+# These are the settings:
+#
+# - max_ports: max # of allowed ports 
+# - lifespan: max # of allowed ports 
+# =============================================================================
+#
+# The test token: intended for short lived manual tests
+test@pipe2me   = max_ports:6 lifespan:180 extend:false unique:false 
+
+# The short test token: intended to test for token timeouts
+short@pipe2me  = max_ports:6 lifespan:3 extend:false unique:false
+
+# The review token: intended for one time guest users
+review@pipe2me = max_ports:6 lifespan:86400 extend:false unique:false

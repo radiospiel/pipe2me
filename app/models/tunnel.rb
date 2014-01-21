@@ -142,7 +142,7 @@ end
 
 module Tunnel::Etest
   def tunnel(options = {})
-    options[:token] = Tunnel::TEST_TOKEN unless options.key?(:token)
+    options[:token] = "test@pipe2me" unless options.key?(:token)
 
     tunnel = Tunnel.create! options
     Tunnel.find(tunnel.id)

@@ -23,9 +23,14 @@ namespace :configure do
 
   # desc "Create config file"
   task :files => "#{VAR}/server.conf"
-
   file "#{VAR}/server.conf" do
     system "cp #{ROOT}/config/server.conf.example #{VAR}/server.conf"
     UI.success "Created #{VAR}/server.conf, please adjust settings there."
+  end
+
+  task :files => "#{VAR}/tokens.conf"
+  file "#{VAR}/tokens.conf" do
+    system "cp #{ROOT}/config/tokens.conf.example #{VAR}/tokens.conf"
+    UI.success "Created #{VAR}/tokens.conf, please review token settings."
   end
 end

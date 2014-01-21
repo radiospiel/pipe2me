@@ -1,35 +1,46 @@
-# A token is an object which allows to create or to extend a tunnel.
+module Tunnel::Token
+end
+
+require_relative "token/parser"
+
+# A token is an object which allows to create a tunnel or to extend
+# a tunnel's lifetime.
 module Tunnel::Token
   SELF = self
 
-  TEST_TOKEN = "test@test.kinko.me"
-  SHORT_TOKEN = "short@test.kinko.me"
-  REVIEW_TOKEN = "review@test.kinko.me"
-
   def self.included(base)
-    base.before_validation :apply_token
-    base.validates_presence_of :expires_at, :unless => :invalid_token?
+    # base.before_validation :apply_token
+    base.validates_presence_of :expires_at
   end
 
-  # Apply the new token
-  def apply_token
-    return if @applied_token
-    @applied_token = true
+  def token=(token)
+    return if token && self.token == token
 
-    return if !new_record? && !token_changed?
+    attrs = Parser.all[token] || { invalid: true }
 
-    SELF.parse(token).each do |key, value|
+    attrs.each do |key, value|
+      # apply values
       case key
-      when :invalid
-        errors.add(:token, "Invalid or missing token: #{token.inspect}")
-      when :max_ports
-        errors.add(:ports, "Too many ports") unless ports.count <= value
-      when :extend
-        errors.add(:token, "This token is valid for new tunnels only") unless new_record?
-      when :period
+      when :lifespan
         self.expires_at = (self.expires_at || Time.now) + value
+        next
+      end
+
+      case key
+      when :max_ports
+        raise "Too many ports" unless ports.count <= value
+      when :extend
+        next if value
+        raise "This token is valid for new tunnels only" unless new_record?
+      when :unique
+        next unless value
+        raise "This token can be used only once" if Tunnel.where(token: token).first
+      else
+        raise "Invalid or missing token: #{token.inspect}"
       end
     end
+
+    super token
   end
 
   private
@@ -37,26 +48,17 @@ module Tunnel::Token
   def invalid_token?
     errors.has_key?(:token)
   end
-
-  def self.parse(token)
-    case token
-    when TEST_TOKEN
-      { :max_ports => 6, :period => 3.minutes, :extend => false }
-    when SHORT_TOKEN
-      { :max_ports => 6, :period => 3.seconds, :extend => false }
-    when REVIEW_TOKEN
-      { :max_ports => 6, :period => 1.day, :extend => false }
-    else
-      { :invalid => true }
-    end
-  end
 end
 
 module Tunnel::Token::Etest
+  if defined?(Tunnel::Etest)
+    include Tunnel::Etest
+  end
+
   T = Tunnel
 
   def test_token_is_needed
-    assert_raise(ActiveRecord::RecordInvalid) {
+    assert_raise(RuntimeError) {
       self.tunnel protocols: %w(http), token: nil
     }
   end
@@ -75,7 +77,7 @@ module Tunnel::Token::Etest
   end
 
   def test_token_port_limit
-    assert_raise(ActiveRecord::RecordInvalid) {
+    assert_raise(RuntimeError) {
       self.tunnel protocols: %w(http https tcp tcp), token: nil
     }
   end
@@ -87,13 +89,21 @@ module Tunnel::Token::Etest
     assert_equal(tunnel.ports.count, 1)
 
     # updating with TEST_TOKEN does nothing
-    tunnel.update_attributes! token: T::TEST_TOKEN
+    tunnel.update_attributes! token: "test@pipe2me"
 
-    # updating with REVIEW_TOKEN raises exception
-    assert_raise(ActiveRecord::RecordInvalid) {
-      tunnel.update_attributes! token: T::REVIEW_TOKEN
+    # updating with REVIEW_TOKEN raises exception: this token cannot
+    # be used to update an existing record
+    assert_raise(RuntimeError) {
+      tunnel.update_attributes! token: "review@pipe2me"
     }
 
-    assert_invalid tunnel, :token
+    assert_raise(RuntimeError) {
+      tunnel.token = "review@pipe2me"
+    }
+  end
+
+  def test_parse_token
+    test_token = Tunnel::Token::Parser.all["test@pipe2me"]
+    assert_equal test_token, max_ports: 6, lifespan: 180, extend: false, unique: false
   end
 end
