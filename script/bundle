@@ -22,10 +22,6 @@ if [[ -e ".rvmrc" ]]; then
   source ".rvmrc"
 fi
 
-echo "curdir is $(pwd)" >> /tmp/start0
-echo "bundle is $(which bundle)" >> /tmp/start0
-echo "cmd is $(eval echo $*)" >> /tmp/start0
-
 # start process.
 # exec bundle exec rackup -p 5000
 #set -xve
