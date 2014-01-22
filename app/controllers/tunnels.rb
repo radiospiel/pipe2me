@@ -67,7 +67,7 @@ class Controllers::Tunnels < Controllers::Base
   end
 
   get "/:id/check" do
-    check = tunnel.check! request.ip
+    check = tunnel.check! source_ip: request.ip
     shell public_attributes(check).merge(ip: request.ip)
   end
 
