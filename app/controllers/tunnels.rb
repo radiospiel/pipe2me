@@ -66,6 +66,11 @@ class Controllers::Tunnels < Controllers::Base
     tunnel ? "tunnel expired" : "!!No such tunnel"
   end
 
+  get "/:id/check" do
+    check = tunnel.check! request.ip
+    shell public_attributes(check).merge(ip: request.ip)
+  end
+
   post "/:id/id_rsa.pub" do
     id_rsa_pub = request.body.read.to_s
     tunnel.add_ssh_key id_rsa_pub
@@ -88,12 +93,21 @@ class Controllers::Tunnels < Controllers::Base
     @tunnel ||= Tunnel.find(params[:id])
   end
 
-  def public_attributes(tunnel)
-    {
-      id:               tunnel.id,
-      fqdn:             tunnel.fqdn,
-      urls:             tunnel.urls,
-      tunnel:           tunnel.tunnel_private_url
-    }
+  def public_attributes(obj)
+    case obj
+    when Tunnel
+      {
+        id:               obj.id,
+        fqdn:             obj.fqdn,
+        urls:             obj.urls,
+        tunnel:           obj.tunnel_private_url
+      }
+    when Tunnel::Check
+      {
+        id:               obj.tunnel_id,
+        status:           obj.status,
+        checked_at:       obj.created_at
+      }
+    end
   end
 end

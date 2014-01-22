@@ -6,6 +6,7 @@ end
 
 require_relative "tunnel/fqdn"
 require_relative "tunnel/port"
+require_relative "tunnel/check"
 require_relative "tunnel/token"
 require_relative "tunnel/status"
 
@@ -94,6 +95,21 @@ class Tunnel < ActiveRecord::Base
     end
   end
 
+  # -- check ------------------------------------------------------------------
+
+  has_many :checks, :class_name => "::Tunnel::Check", :dependent => :destroy
+
+  # [todo] - implement a check whether or not the tunnel is online.
+  # [todo] - run check! in the background
+  def check!(options = {})
+    # expect! options => { source_ip: String }
+    status = ports.all? do |port|
+      port.available? options[:source_ip]
+    end
+
+    checks.create!(source_ip: options[:source_ip], status: status ? "online" : "offline")
+  end
+
   # -- dynamic attributes -----------------------------------------------------
 
   def urls(protocol = nil)
@@ -159,5 +175,10 @@ module Tunnel::Etest
 
     url_protocols = tunnel.urls.map { |url| URI.parse(url).scheme }
     assert_equal(url_protocols, %w(http https) )
+  end
+
+  def test_tunnel_check
+    tunnel = self.tunnel protocols: %w(http https)
+    tunnel.check! source_ip: "127.0.0.1"
   end
 end

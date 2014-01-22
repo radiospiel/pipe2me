@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 5) do
+ActiveRecord::Schema.define(version: 6) do
+
+  create_table "tunnel_checks", force: true do |t|
+    t.integer  "tunnel_id"
+    t.string   "source_ip"
+    t.string   "status"
+    t.datetime "created_at"
+  end
+
+  add_index "tunnel_checks", ["status"], name: "index_tunnel_checks_on_status"
+  add_index "tunnel_checks", ["tunnel_id"], name: "index_tunnel_checks_on_tunnel_id"
 
   create_table "tunnel_ports", force: true do |t|
     t.integer  "port"
