@@ -36,6 +36,22 @@ The server is run via the monit(1) tool. To configure and run it, just run
 
 **Note:** There are also `rake stop` and `rake restart` commands.
 
+## Updating a server
+
+To update the server, change into the server directory and
+
+    # stop the server
+    rake stop
+
+    # pull and merge the new software version
+    git pull
+
+    # install dependencies and migrate database, if needed.
+    bundle install
+
+    # start the server again
+    rake start
+
 ## Running tests
 
 The server comes with tests of its own. To run tests, you must, of course configure
