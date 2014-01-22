@@ -149,10 +149,8 @@ class Tunnel < ActiveRecord::Base
     SSHD.write_authorized_keys
   end
 
+  # [todo] - implement a method to kill current connections once the tunnel becomes invalid.
   def kill_connections
-    # find all sshd instances for the ports of this connection
-    # pids = [1,2,3]
-
   end
 end
 
