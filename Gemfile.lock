@@ -30,7 +30,7 @@ GEM
     i18n (0.6.9)
     minitest (4.7.5)
     multi_json (1.8.4)
-    pipe2me-client (0.2.4)
+    pipe2me-client (0.2.6)
       foreman
       rack
       simple-ui
@@ -45,7 +45,7 @@ GEM
     rack_csrf (2.4.0)
       rack (>= 0.9)
     rake (10.1.1)
-    simple-ui (0.2.1)
+    simple-ui (0.2.2)
     simplecov (0.8.2)
       docile (~> 1.1.0)
       multi_json

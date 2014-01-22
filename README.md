@@ -31,10 +31,10 @@ An installation guide is in [doc/install.md](https://github.com/kinkome/pipe2me/
 The server is run via the monit(1) tool. To configure and run it, just run
 
 <pre>
-~/pipe2me$ <b>rake configure</b>
-~/pipe2me$ <b>monit -c monitrc</b>
-~/pipe2me$ <b>monit -c monitrc start all</b>
+~/pipe2me$ <b>rake configure start</b>
 </pre>
+
+**Note:** There are also `rake stop` and `rake restart` commands.
 
 ## Running tests
 
