@@ -37,16 +37,16 @@ namespace :run do
 end
 
 desc "Start the pipe2me server"
-task :start do
-  Kernel.exec "bash", "-c", "monit -c monitrc && monit -c monitrc start all"
+task :start => "configure" do
+  system "monit -c monitrc && monit -c monitrc start all"
 end
 
 desc "Stop the pipe2me server"
 task :stop do
-  Kernel.exec "bash", "-c", "monit -c monitrc stop all && monit -c monitrc quit"
+  system "monit -c monitrc stop all && monit -c monitrc quit"
 end
 
 desc "Restart the pipe2me server"
 task :restart do
-  Kernel.exec "bash", "-c", "monitrc stop all && monit -c monitrc reload && monit -c monitrc start all"
+  system "monit -c monitrc stop all && monit -c monitrc reload && monit -c monitrc start all"
 end
