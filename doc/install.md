@@ -1,6 +1,4 @@
-## Installing your own pipe2me server
-
-### TL;DR
+## Installing your own pipe2me server (TL;DR)
 
 - Have a user account
 - Have ruby version 2, git, monit, daemon, nginx installed
@@ -14,6 +12,8 @@
         rake configure
         monit -c monitrc
         monit -c monitrc start all
+
+## Installing your own pipe2me server (extended version)
 
 ### Add a user for the pipe2me server
 
