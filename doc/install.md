@@ -8,10 +8,8 @@
         cd pipe2me
         bundle install
         rake configure
-        # edit var/server.conf, at least change TUNNEL_HOST
-        rake configure
-        monit -c monitrc
-        monit -c monitrc start all
+        # edit var/server.conf, at least change TUNNEL_DOMAIN
+        rake start
 
 ## Installing your own pipe2me server (extended version)
 
