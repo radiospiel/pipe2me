@@ -11,6 +11,13 @@
         # edit var/server.conf, at least change TUNNEL_DOMAIN
         rake start
 
+- If you want to listen for connections on ports <1024
+  without running the server as root, set the appropriate
+  capabilities on the server executable (Linux only):
+
+        sudo apt-get install libcap2-bin &&
+        sudo setcap 'CAP_NET_BIND_SERVICE+p' "$(which pipe2me)"
+
 ## Installing your own pipe2me server (extended version)
 
 ### Add a user for the pipe2me server
