@@ -4,7 +4,7 @@
 require "shellwords"
 
 
-message = ARGV.join(" ")
+message = " " + ARGV.join(" ")
 
 users, labels = [], []
 message.gsub!(/\s([@#])([a-zA-Z0-9]*)\b/) do
@@ -12,6 +12,8 @@ message.gsub!(/\s([@#])([a-zA-Z0-9]*)\b/) do
   " "
 end
 message.gsub! /\s+/, " "
+message.gsub! /^\s/, ""
+message.gsub! /\s$/, ""
 
 if message == ""
   STDERR.puts "Missing issue title"

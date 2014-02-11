@@ -1,6 +1,4 @@
-## Installing your own pipe2me server
-
-### TL;DR
+## Installing your own pipe2me server (TL;DR)
 
 - Have a user account
 - Have ruby version 2, git, monit, daemon, nginx installed
@@ -10,10 +8,10 @@
         cd pipe2me
         bundle install
         rake configure
-        # edit var/server.conf, at least change TUNNEL_HOST
-        rake configure
-        monit -c monitrc
-        monit -c monitrc start all
+        # edit var/server.conf, at least change TUNNEL_DOMAIN
+        rake start
+
+## Installing your own pipe2me server (extended version)
 
 ### Add a user for the pipe2me server
 
@@ -58,22 +56,6 @@ user@test.pipe2.me:~$ <b>\curl -sSL https://get.rvm.io | bash -s stable --ruby</
 user@test.pipe2.me:~$ <b>source ~/.rvm/scripts/rvm</b>
 user@test.pipe2.me:~$ <b>ruby -v</b>
 ruby 2.1.0p0 (2013-12-25 revision 44422) [x86_64-linux]
-</pre>
-
-### Adjust path
-
-The pipe2me server software is a complete package and combines a number of
-tools, including sshd and nginx. It must be able to access these binaries via
-its `$PATH`.
-
-As Deian installs both sshd and nginx in `/usr/sbin`, but doesn't include that
-one in a regular user's $PATH, we must add this directory to the user's $PATH
-setting:
-
-<pre>
-~$ <b>echo 'PATH=$PATH:/usr/sbin' >> .profile</b>
-~$ <b>echo 'PATH=$PATH:/usr/sbin' >> .bash_profile</b>
-~$ <b>. .profile</b>
 </pre>
 
 ### Get source code
