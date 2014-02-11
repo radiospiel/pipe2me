@@ -58,22 +58,6 @@ user@test.pipe2.me:~$ <b>ruby -v</b>
 ruby 2.1.0p0 (2013-12-25 revision 44422) [x86_64-linux]
 </pre>
 
-### Adjust path
-
-The pipe2me server software is a complete package and combines a number of
-tools, including sshd and nginx. It must be able to access these binaries via
-its `$PATH`.
-
-As Deian installs both sshd and nginx in `/usr/sbin`, but doesn't include that
-one in a regular user's $PATH, we must add this directory to the user's $PATH
-setting:
-
-<pre>
-~$ <b>echo 'PATH=$PATH:/usr/sbin' >> .profile</b>
-~$ <b>echo 'PATH=$PATH:/usr/sbin' >> .bash_profile</b>
-~$ <b>. .profile</b>
-</pre>
-
 ### Get source code
 
 <pre>

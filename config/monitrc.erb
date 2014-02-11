@@ -1,7 +1,8 @@
 <%
   def which(*names)
+    extra_paths = "/usr/sbin"
     names.map do |name|
-      path = `which #{name}`.chomp
+      path = `PATH=${PATH}:#{extra_paths} which #{name}`.chomp
       raise "Missing #{name}" if path == ""
       path
     end
