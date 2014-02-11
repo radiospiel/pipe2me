@@ -7,7 +7,7 @@
     end
   end
 
-  daemon, sshd, nginx = which :daemon, :sshd, :nginx
+  daemon, sshd, nginx, sudo = which :daemon, :sshd, :nginx, :sudo
 
   def log(process)
     process = "pipe2me"
@@ -42,5 +42,5 @@ check process sshd with pidfile <%= VAR %>/pids/sshd.pid
   stop program = "/bin/sh -c 'kill -9 $(cat <%= VAR %>/pids/sshd.pid)'"
 
 check process nginx with pidfile <%= VAR %>/pids/nginx.pid
-  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> -- <%= nginx %> -c <%= VAR %>/config/nginx.conf " with timeout 60 seconds
+  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> -- <%= sudo %> <%= nginx %> -c <%= VAR %>/config/nginx.conf " with timeout 60 seconds
   stop program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> --stop"
