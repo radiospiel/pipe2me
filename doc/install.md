@@ -14,6 +14,12 @@
         rake configure
         monit -c monitrc
         monit -c monitrc start all
+- If you want to listen for connections on ports <1024
+  without running the server as root, set the appropriate
+  capabilities on the server executable (Linux only):
+
+        sudo apt-get install libcap2-bin &&
+        sudo setcap 'CAP_NET_BIND_SERVICE+p' "$(which pipe2me)"
 
 ### Add a user for the pipe2me server
 
