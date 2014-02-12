@@ -6,3 +6,4 @@
 *.rake filter=trimWhitespace
 *.erb filter=trimWhitespace
 *.conf filter=trimWhitespace
+*.example filter=trimWhitespace

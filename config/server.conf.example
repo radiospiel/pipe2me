@@ -2,23 +2,34 @@
 # machine.
 #
 # For local development we recommend it to set this to "pipe2.dev" and, if needed,
-# to add an entry in /etc/hosts which makes pipe2.dev point to 127.0.0.1. 
+# to add an entry in /etc/hosts which makes pipe2.dev point to 127.0.0.1.
 TUNNEL_DOMAIN = "pipe2.dev"
 
 # The ports for tunnel endpoints
 TUNNEL_PORTS = 10000...20000
 
-# Set port for HTTP connection. Set this to false if the server should not accept 
+# Set port for HTTP connection. Set this to false if the server should not accept
 # HTTP connections.
+#
+# Note: if this is a priviled port (< 1024) the user must be allowed to run nginx via sudo.
 HTTP_PORT  = 8080
 
 # Set port for HTTPS connection.
+#
+# Note: if this is a priviled port (< 1024) the user must be allowed to run nginx via sudo.
 HTTPS_PORT = 8443
 
 # Set port for SSHD connection from pipe2me clients.
+#
+# Note: this must not be a priviled port.
 SSHD_PORT = 8444
 
-# The monit daemon needs a port to communicate with
+# The monit daemon needs a port to communicate with.
+#
+# Notes:
+# - monit binds to this port on localhost only
+# - this must not be a priviled port.
+#
 MONIT_PORT = 8445
 
 # Route HTTP(S) requests below /monit/ to monit daemon?
