@@ -47,7 +47,7 @@ check process checker with pidfile <%= VAR %>/pids/checker.pid
 check process sshd with pidfile <%= VAR %>/pids/sshd.pid
   <%
     start_command = "#{sshd} -e -f #{VAR}/config/sshd.conf -o PidFile=#{VAR}/pids/sshd.pid"
-    start_command = "#{command} 2>&1 | logger -p #{error_log} -t pipe2me"
+    start_command = "#{start_command} 2>&1 | logger -p #{error_log} -t pipe2me"
 
     stop_command = "kill -9 $(cat #{VAR}/pids/sshd.pid)"
   %>
