@@ -41,7 +41,9 @@ http {
   <% if HTTP_PORT %>
   server {
     set $root <%= ROOT %>;
+    <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
+    <% end %>
     listen <%= HTTP_PORT %>;
     include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>
@@ -53,6 +55,9 @@ http {
   <% if HTTPS_PORT %>
   server {
     set $root <%= ROOT %>;
+    <% if MONIT_PORT %>
+    set $monit_port <%= MONIT_PORT %>;
+    <% end %>
     listen               <%= HTTPS_PORT %>;
     ssl                  on;
     ssl_certificate      <%= VAR %>/openssl/certs/localhost.pem;
