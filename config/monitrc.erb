@@ -8,12 +8,17 @@
     end
   end
 
-  daemon, sshd, nginx, sudo = which :daemon, :sshd, :nginx, :sudo
+  daemon, sshd, nginx, _sudo = which :daemon, :sshd, :nginx, :sudo
 
-  def log(process)
-    process = "pipe2me"
-    "#{VAR}/log/#{process}.log"
+  if (HTTP_PORT && HTTP_PORT < 1024) || (HTTPS_PORT && HTTPS_PORT < 1024)
+    nginx = "#{_sudo} #{nginx}"
   end
+  # log destinations. The access_log is the log destination for everything which is not
+  # an error; error_log is the log destination for error messages. The following strings
+  # define syslog targets; see daemon(1).
+  access_log = "user.notice"
+  error_log  = "user.err"
+  daemon = "#{daemon} --stdout #{access_log} --stderr #{error_log}"
 
   bundle = "#{ROOT}/script/bundle"
 %>
@@ -22,26 +27,34 @@ set daemon 10
 set httpd port <%= MONIT_PORT %> and use address localhost allow localhost
 
 check process web with pidfile <%= VAR %>/pids/web.pid
-  start program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --output <%= log :web %> -- <%= bundle %> exec puma -b unix:<%= VAR %>/web.sock" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --output <%= log :web %> --stop"
+  <% command = "#{bundle} exec puma -b unix:#{VAR}/web.sock" %>
+  start program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --stop"
 
 check process checker with pidfile <%= VAR %>/pids/checker.pid
-  start program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --output <%= log :checker %> -- <%= bundle %> exec rake run:check" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --output <%= log :checker %> --stop"
+  <% command = "#{bundle} exec rake run:check" %>
+  start program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --stop"
 
+# [todo] terminate connections
+#
 # sshd is not started by daemon. daemon(1) stops processes by sending SIGTERMs.
 # When receiving SIGTERMs sshd, however, only terminates when there are no more
 # connections.
 #
 # While we need to terminate running connections by other means, we at least want
 # the master process to stop - which means we want to SIGKILL it.
-#
-# [todo] terminate connections
-# [bug] sshd logging
 check process sshd with pidfile <%= VAR %>/pids/sshd.pid
-  start program = "<%= sshd %> -e -f <%= VAR %>/config/sshd.conf -o PidFile=<%= VAR %>/pids/sshd.pid" with timeout 60 seconds
-  stop program = "/bin/sh -c 'kill -9 $(cat <%= VAR %>/pids/sshd.pid)'"
+  <%
+    start_command = "#{sshd} -e -f #{VAR}/config/sshd.conf -o PidFile=#{VAR}/pids/sshd.pid"
+    start_command = "#{command} 2>&1 | logger -p #{error_log} -t pipe2me"
+
+    stop_command = "kill -9 $(cat #{VAR}/pids/sshd.pid)"
+  %>
+  start program = "/bin/sh -c '<%= start_command %>'" with timeout 60 seconds
+  stop program = "/bin/sh -c '<%= stop_command %>'"
 
 check process nginx with pidfile <%= VAR %>/pids/nginx.pid
-  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> -- <%= sudo %> <%= nginx %> -c <%= VAR %>/config/nginx.conf " with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --output <%= log :nginx %> --stop"
+  <% command = "#{nginx} -c #{VAR}/config/nginx.conf" %>
+  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --stop"

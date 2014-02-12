@@ -8,7 +8,7 @@ user <%= `whoami`.chomp %>;
 pid <%= VAR %>/pids/nginx.pid;
 
 # error_log    ${{VAR}}/log/proxy-errors.log  main;
-error_log      /dev/stdout;
+error_log      /dev/stderr;
 
 # pid         ${{VAR}}/log/nginx.pid;
 
