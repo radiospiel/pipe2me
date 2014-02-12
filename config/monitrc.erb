@@ -13,16 +13,20 @@
   if (HTTP_PORT && HTTP_PORT < 1024) || (HTTPS_PORT && HTTPS_PORT < 1024)
     # try to run nginx via sudo. This will ask for a password via /bin/false
     # if the user cannot run sudo.
-    system "SUDO_ASKPASS=/bin/false #{_sudo} -A #{nginx} -v"
+    sudo_allowed =
+      system("SUDO_ASKPASS=/bin/false #{_sudo} -A #{nginx} -v") &&
+      system("SUDO_ASKPASS=/bin/false #{_sudo} -A #{daemon} -V")
 
-    if $?.exitstatus != 0
+    unless sudo_allowed
       UI.error "To use privileged HTTP/S ports you must be allowed to run nginx via sudo."
       UI.warn "Fix that by adding the following line via visudo:"
-      UI.warn "\n#{`whoami`.chomp} ALL=NOPASSWD: #{nginx}"
+      UI.warn "\n#{`whoami`.chomp} ALL=NOPASSWD: #{nginx},#{daemon}"
       exit 1
     end
     nginx = "#{_sudo} #{nginx}"
+    nginx_daemon = "#{_sudo} #{daemon}"
   end
+  
   # log destinations. The access_log is the log destination for everything which is not
   # an error; error_log is the log destination for error messages. The following strings
   # define syslog targets; see daemon(1).
@@ -66,5 +70,5 @@ check process sshd with pidfile <%= VAR %>/pids/sshd.pid
 
 check process nginx with pidfile <%= VAR %>/pids/nginx.pid
   <% command = "#{nginx} -c #{VAR}/config/nginx.conf" %>
-  start program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --stop"
+  start program = "<%= nginx_daemon %> -N --name nginx --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
+  stop program = "<%= nginx_daemon %> -N --name nginx --pidfiles <%= VAR %>/pids --stop"
