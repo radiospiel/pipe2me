@@ -10,6 +10,13 @@
 
   daemon, sshd, nginx, _sudo = which :daemon, :sshd, :nginx, :sudo
 
+  # log destinations. The access_log is the log destination for everything which is not
+  # an error; error_log is the log destination for error messages. The following strings
+  # define syslog targets; see daemon(1).
+  access_log = "user.notice"
+  error_log  = "user.err"
+  daemon = "#{daemon} --stdout #{access_log} --stderr #{error_log}"
+
   if (HTTP_PORT && HTTP_PORT < 1024) || (HTTPS_PORT && HTTPS_PORT < 1024)
     # try to run nginx via sudo. This will ask for a password via /bin/false
     # if the user cannot run sudo.
@@ -26,13 +33,6 @@
     nginx = "#{_sudo} #{nginx}"
     nginx_daemon = "#{_sudo} #{daemon}"
   end
-
-  # log destinations. The access_log is the log destination for everything which is not
-  # an error; error_log is the log destination for error messages. The following strings
-  # define syslog targets; see daemon(1).
-  access_log = "user.notice"
-  error_log  = "user.err"
-  daemon = "#{daemon} --stdout #{access_log} --stderr #{error_log}"
 
   bundle = "#{ROOT}/script/bundle"
 %>
