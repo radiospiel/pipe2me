@@ -20,6 +20,14 @@ require "#{File.dirname(__FILE__)}/config/environment"
 # -- redirect stdout via timestamp tool ---------------------------------------
 
 require "rack"
+
+if ENV["STATHAT_EMAIL"]
+  require "rack/stathat"
+  use Rack::Stathat, :ez_api_key => ENV["STATHAT_EMAIL"], :prefix => ENV["STATHAT_PREFIX"]
+else
+  STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX environment values"
+end
+
 require "sinatra/base"
 
 if Sinatra::Base.development?

@@ -37,3 +37,5 @@ group :development do
   gem "timecop"
   gem "simplecov"
 end
+
+gem "stathat"
