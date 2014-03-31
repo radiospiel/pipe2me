@@ -11,8 +11,8 @@ namespace :iptables do
     end
   end
 
-  task :report do
-    stats = system("sbin/iptables_report")
+  task :report  do
+    stats = `sbin/iptables_report`
 
     traffic_total = 0
     stats.lines.each do |line|
@@ -31,7 +31,11 @@ namespace :iptables do
       next
     end
 
+    require "stathat"
+    
     prefix = STATHAT_PREFIX || "test"
-    StatHat::API.ez_post_value("#{prefix}.traffic", STATHAT_EMAIL, traffic_total)
+    StatHat::SyncAPI.ez_post_value("#{prefix}.traffic", STATHAT_EMAIL, traffic_total)
+
+    UI.warn "reported #{prefix}.traffic: #{traffic_total}"
   end
 end
