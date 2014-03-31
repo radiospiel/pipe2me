@@ -8,3 +8,6 @@ monitrc
 config/nginx.conf
 .bundle/
 coverage
+/vendor/bundle
+/old
+/tmp
