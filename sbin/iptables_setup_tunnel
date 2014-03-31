@@ -5,6 +5,7 @@ usage() {
 }
 
 set -e
+# set -xv
 
 PORTS=$1
 RULE_NAME=$2
@@ -15,6 +16,6 @@ iptables="sudo iptables"
 
 $iptables -N ${RULE_NAME} || true
 
-$iptables -C INPUT -p tcp -j $RULE_NAME -m multiport --dports $PORTS ||
+$iptables -C INPUT -p tcp -j $RULE_NAME -m multiport --dports $PORTS > /dev/null ||
 $iptables -A INPUT -p tcp -j $RULE_NAME -m multiport --dports $PORTS
 
