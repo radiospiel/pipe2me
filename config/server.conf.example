@@ -34,3 +34,11 @@ MONIT_PORT = 8445
 
 # Route HTTP(S) requests below /monit/ to monit daemon?
 MONIT_PUBLIC_ACCESS = false
+
+# Stathat configuration.
+#
+# stathat gets activated when a configuration exists here. Set the email
+# address.
+#
+# STATHAT_EMAIL = "my-stathat-account@somewhere.test"
+STATHAT_PREFIX = "live"

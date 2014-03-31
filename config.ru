@@ -21,11 +21,12 @@ require "#{File.dirname(__FILE__)}/config/environment"
 
 require "rack"
 
-if ENV["STATHAT_EMAIL"]
+if defined?(STATHAT_EMAIL)
+  STATHAT_PREFIX = nil unless defined?(STATHAT_PREFIX)
   require "rack/stathat"
-  use Rack::Stathat, :ez_api_key => ENV["STATHAT_EMAIL"], :prefix => ENV["STATHAT_PREFIX"]
+  use Rack::Stathat, :ez_api_key => STATHAT_EMAIL, :prefix => STATHAT_PREFIX || "test"
 else
-  STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX environment values"
+  STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX entries in var/server.conf"
 end
 
 require "sinatra/base"
