@@ -39,3 +39,4 @@ group :development do
 end
 
 gem "stathat"
+gem "whenever"
