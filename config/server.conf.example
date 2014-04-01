@@ -42,3 +42,4 @@ MONIT_PUBLIC_ACCESS = false
 #
 # STATHAT_EMAIL = "my-stathat-account@somewhere.test"
 STATHAT_PREFIX = "live"
+

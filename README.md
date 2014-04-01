@@ -62,6 +62,25 @@ and setup this package. After that run the tests via `rake`:
 
 You should also run the tests in the pipe2me-client package. See there for more details.
 
+## Reporting traffic stats
+
+Note: Traffic stats are only estimates at this point.
+
+pipe2me uses the `ipconfig` tool to collect traffic stats on the various ports
+and tunnels. pipe2me is prepared to report a total traffic count to stathat. To
+enable this feature define these entries in the `server.conf` file
+
+    STATHAT_EMAIL = "<your stathat email address>"
+    STATHAT_PREFIX = "live"
+
+Stats are reported via the `iptables:report` rake task. A `whenever` configuration
+which runs the `ipconfig:setup` and `ipconfig:report` tasks every 10 minutes is
+prepared in config/schedule.rb. To install it into your crontab, run
+
+    whenever --update-crontab
+
+once.
+
 ## Licensing
 
 This software is released to you under the terms of the "GNU Affero General

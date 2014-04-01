@@ -18,7 +18,7 @@
 # end
 
 every 10.minutes do
-  rake "iptables:report"
+  rake "iptables:setup iptables:report"
 end
 
 # Learn more: http://github.com/javan/whenever
