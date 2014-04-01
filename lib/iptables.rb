@@ -41,18 +41,16 @@ module IPTables
       next unless traffic != 0
 
       # -- determine tunnel for that rule -------------------------------------
-      min_port = rule.gsub(/.*\D(\d+)$/, "\\1").to_i
+      min_port = name.gsub(/.*\D(\d+)$/, "\\1").to_i
       tunnel = Tunnel.includes(:ports).where("tunnel_ports.port" => min_port).first
-      next unless tunnel
+      # next unless tunnel
 
       # -- report traffic to tunnel -------------------------------------------
-      tunnel.report_traffic traffic
+      # tunnel.report_traffic traffic
 
       # -- determine tunnel for that rule -------------------------------------
       traffic_total += traffic
     end
-
-    UI.success "traffic_total: #{traffic_total}"
 
     send_to_stathat :traffic => traffic_total
   end
@@ -65,7 +63,7 @@ module IPTables
       next hsh if line !~ /PIPE2ME/
 
       parts = line.split(/\s+/)
-      hsh.update part[2] => part[1].to_i
+      hsh.update parts[3] => parts[2].to_i
     end
   end
 
@@ -78,10 +76,10 @@ module IPTables
 
     require "stathat"
 
-    options.eacho do |key, value|
+    options.each do |key, value|
       StatHat::SyncAPI.ez_post_count("#{prefix}.#{key}", STATHAT_EMAIL, value)
     end
 
-    UI.warn "reported #{prefix}.traffic: #{traffic_total}"
+    UI.warn "reported #{prefix}", options
   end
 end
