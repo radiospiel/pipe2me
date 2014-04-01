@@ -1,2 +1,0 @@
-#!/bin/bash
-sudo /sbin/iptables -L INPUT -n -x -v | awk '{ print $3 ":" $2 ; }' | grep PIPE2ME

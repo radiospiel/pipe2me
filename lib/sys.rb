@@ -46,4 +46,14 @@ module Sys
   def bash(cmd, &block)
     sys "bash", "-c", cmd, &block
   end
+
+  # sudo: never asks for a password.
+  def sudo!(*args, &block)
+    sys! "sudo", "-n", *args, &block
+  end
+
+  # sudo: never asks for a password.
+  def sudo(*args, &block)
+    sys "sudo", "-n", *args, &block
+  end
 end
