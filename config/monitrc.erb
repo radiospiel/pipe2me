@@ -32,6 +32,8 @@
     end
     nginx = "#{_sudo} #{nginx}"
     nginx_daemon = "#{_sudo} #{daemon}"
+  else
+    nginx_daemon = "#{daemon}"
   end
 
   bundle = "#{ROOT}/script/bundle"
