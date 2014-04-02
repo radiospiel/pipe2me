@@ -19,6 +19,7 @@ task :configure => "db:migrate"
 task :configure => "nginx:configure"
 task :configure => "sshd:configure"
 task :configure => "monit:configure"
+task :configure => "redis:configure"
 
 task :default => "test"
 
