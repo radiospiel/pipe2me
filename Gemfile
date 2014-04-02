@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # -- web server framework -----------------------------------------------------
 
-gem "thin"
+gem "thin", '~> 1.5.1'
 
 gem "rack"
 gem "rack_csrf"
@@ -40,3 +40,4 @@ end
 
 gem "stathat"
 gem "whenever"
+gem "fnordmetric"

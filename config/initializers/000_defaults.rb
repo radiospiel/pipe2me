@@ -5,3 +5,7 @@ else
   load "#{ROOT}/config/server.conf.example"
   UI.error "Note: make sure to create and edit a custom configuration in #{VAR}/server.conf, by running 'rake configure'"
 end
+
+if !defined?(FNORDMETRIC_PORT)
+  FNORDMETRIC_PORT=8445
+end
