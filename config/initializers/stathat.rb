@@ -8,7 +8,12 @@ module StatHat
   end
 
   module Quick
-    PREFIX = STATHAT_PREFIX || "test"
+    if defined?(STATHAT_PREFIX)
+      PREFIX = STATHAT_PREFIX || "test"
+    else
+      PREFIX = "test"
+    end
+
     def count(name, value = 1)
       StatHat::SyncAPI.ez_post_count("#{PREFIX}.#{name}", STATHAT_EMAIL, value)
     end
