@@ -18,3 +18,5 @@ def open_socket(path, retries = 4)
 end
 
 MetricSystem.target = open_socket(METRIC_SYSTEM_SOCKET)
+
+StatHat.api = StatHat::API

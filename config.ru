@@ -22,11 +22,8 @@ require "#{File.dirname(__FILE__)}/config/web"
 
 require "rack"
 
-if defined?(STATHAT_EMAIL)
-  STATHAT_PREFIX = nil unless defined?(STATHAT_PREFIX)
-  require "rack/stathat"
-  use Rack::Stathat, :ez_api_key => STATHAT_EMAIL, :prefix => STATHAT_PREFIX || "test"
-end
+require "rack/metrics"
+use Rack::Metrics
 
 require "sinatra/base"
 

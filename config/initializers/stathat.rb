@@ -7,6 +7,11 @@ module StatHat
     end
   end
 
+  module SwitchableAPI
+    attr :api, true
+  end
+  extend SwitchableAPI
+
   module Quick
     if defined?(STATHAT_PREFIX)
       PREFIX = STATHAT_PREFIX || "test"
@@ -15,14 +20,16 @@ module StatHat
     end
 
     def count(name, value = 1)
-      StatHat::SyncAPI.ez_post_count("#{PREFIX}.#{name}", STATHAT_EMAIL, value)
+      api.ez_post_count("#{PREFIX}.#{name}", STATHAT_EMAIL, value)
     end
 
     def value(name, value)
-      StatHat::SyncAPI.ez_post_value("#{PREFIX}.#{name}", STATHAT_EMAIL, value)
+      api.ez_post_value("#{PREFIX}.#{name}", STATHAT_EMAIL, value)
     end
   end
 end
+
+StatHat.api = StatHat::SyncAPI
 
 unless defined?(STATHAT_EMAIL)
   STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX entries in var/server.conf"
