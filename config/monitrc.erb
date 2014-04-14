@@ -43,7 +43,7 @@ set daemon 10
 set httpd port <%= MONIT_PORT %> and use address localhost allow localhost
 
 check process web with pidfile <%= VAR %>/pids/web.pid
-  <% command = "#{bundle} exec thin -S #{VAR}/web.sock" %>
+  <% command = "#{bundle} exec thin -S #{VAR}/web.sock start" %>
   start program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
   stop program = "<%= daemon %> -N --name web --pidfiles <%= VAR %>/pids --stop"
 
