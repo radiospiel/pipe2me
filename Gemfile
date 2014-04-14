@@ -39,5 +39,5 @@ group :development do
 end
 
 gem "stathat"
-gem "metric_system", '~> 0.1.3'
+gem "metric_system", '~> 0.1.4'
 gem "whenever"
