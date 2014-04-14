@@ -39,7 +39,7 @@ namespace :run do
     while true do
       sleep 1
       UI.success "check"
-      MetricSystem.count
+      MetricSystem.count "check", 1
       Tunnel.check do
         SSHD.write_authorized_keys
       end
