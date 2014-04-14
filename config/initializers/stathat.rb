@@ -1,3 +1,5 @@
+require "stathat"
+
 module StatHat
   module QuickDummy
     def count(name, value = 1)
