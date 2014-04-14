@@ -52,10 +52,10 @@ check process checker with pidfile <%= VAR %>/pids/checker.pid
   start program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
   stop program = "<%= daemon %> -N --name checker --pidfiles <%= VAR %>/pids --stop"
 
-check process metric_system with pidfile <%= VAR %>/pids/metric_system.pid
+check process metricsystem with pidfile <%= VAR %>/pids/metricsystem.pid
   <% command = "#{bundle} exec script/metric_system" %>
-  start program = "<%= daemon %> -N --name metric_system --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
-  stop program = "<%= daemon %> -N --name metric_system --pidfiles <%= VAR %>/pids --stop"
+  start program = "<%= daemon %> -N --name metricsystem --pidfiles <%= VAR %>/pids -- <%= command %>" with timeout 60 seconds
+  stop program = "<%= daemon %> -N --name metricsystem --pidfiles <%= VAR %>/pids --stop"
 
 # [todo] terminate connections
 #
