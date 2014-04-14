@@ -40,4 +40,4 @@ end
 
 gem "stathat"
 gem "whenever"
-gem "fnordmetric"
+#gem "fnordmetric"

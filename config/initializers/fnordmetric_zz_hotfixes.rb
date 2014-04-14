@@ -1,3 +1,5 @@
+__END__
+
 class FnordMetric::Widget
   def ticks
     ensure_has_tick!
