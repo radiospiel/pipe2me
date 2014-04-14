@@ -68,6 +68,10 @@ class Tunnel < ActiveRecord::Base
     self.fqdn = FQDN.generate(self.id) unless fqdn?
   end
 
+  def subdomain
+    fqdn.split(".", 2).first
+  end
+
   # -- ports ------------------------------------------------------------------
 
   attr :protocols, true
@@ -93,6 +97,10 @@ class Tunnel < ActiveRecord::Base
       port.update_attributes! protocol: protocol
       self.ports << port
     end
+  end
+
+  def name
+    fqdn
   end
 
   # -- check ------------------------------------------------------------------
@@ -151,6 +159,16 @@ class Tunnel < ActiveRecord::Base
 
   # [todo] - implement a method to kill current connections once the tunnel becomes invalid.
   def kill_connections
+  end
+
+  # -- metrics ----------------------------------------------------------------
+
+  def report_traffic(traffic)
+    MetricSystem.count "traffic.#{subdomain}", traffic
+  end
+
+  def self.report_traffic_total(traffic)
+    StatHat.count "traffic", traffic
   end
 end
 

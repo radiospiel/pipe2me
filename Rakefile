@@ -23,12 +23,23 @@ task :configure => "redis:configure"
 
 task :default => "test"
 
+task :update do
+  # pull updated source
+  Sys.sys! "git", "stash"
+  Sys.sys! "git", "pull", "--rebase"
+  Sys.sys! "git", "stash", "pop"
+  Sys.sys! "bundle", "install"
+  Sys.sys! "rake", "db:migrate", "configure"
+  Sys.sys! "whenever", "--update-crontab"
+end
+
 namespace :run do
   task :check do
     ActiveRecord::Base.logger.level = Logger::INFO
     while true do
-      sleep 5
+      sleep 1
       UI.success "check"
+      MetricSystem.count
       Tunnel.check do
         SSHD.write_authorized_keys
       end

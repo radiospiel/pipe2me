@@ -16,6 +16,7 @@
 # -- load app environment -----------------------------------------------------
 
 require "#{File.dirname(__FILE__)}/config/environment"
+require "#{File.dirname(__FILE__)}/config/web"
 
 # -- redirect stdout via timestamp tool ---------------------------------------
 
@@ -25,8 +26,6 @@ if defined?(STATHAT_EMAIL)
   STATHAT_PREFIX = nil unless defined?(STATHAT_PREFIX)
   require "rack/stathat"
   use Rack::Stathat, :ez_api_key => STATHAT_EMAIL, :prefix => STATHAT_PREFIX || "test"
-else
-  STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX entries in var/server.conf"
 end
 
 require "sinatra/base"

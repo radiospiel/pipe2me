@@ -45,14 +45,14 @@ module IPTables
       tunnel = Tunnel.includes(:ports).where("tunnel_ports.port" => min_port).first
       # next unless tunnel
 
-      # -- report traffic to tunnel -------------------------------------------
-      # tunnel.report_traffic traffic
+      # -- report traffic per tunnel ------------------------------------------
+      tunnel.report_traffic traffic
 
       # -- determine tunnel for that rule -------------------------------------
       traffic_total += traffic
     end
 
-    send_to_stathat :traffic => traffic_total
+    Tunnel.report_traffic_total traffic_total
   end
 
   private
@@ -67,19 +67,16 @@ module IPTables
     end
   end
 
-  def send_to_stathat(options)
-    unless defined?(STATHAT_EMAIL)
-      STDERR.puts "To report requests to stathat set the STATHAT_EMAIL and STATHAT_PREFIX entries in var/server.conf"
-      return
-    end
-    prefix = STATHAT_PREFIX || "test"
+  public
 
-    require "stathat"
-
-    options.each do |key, value|
-      StatHat::SyncAPI.ez_post_count("#{prefix}.#{key}", STATHAT_EMAIL, value)
+  def fake
+    traffic_total = 0
+    Tunnel.all.each do |tunnel|
+      traffic = tunnel.id
+      tunnel.report_traffic traffic
+      traffic_total += traffic
     end
 
-    UI.warn "reported #{prefix}", options
+    Tunnel.report_traffic_total traffic_total
   end
 end

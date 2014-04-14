@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+load "config/metric_system.rb"
+require "metric_system/server"
+
+MetricSystem::Server.run METRIC_SYSTEM_DATABASE, METRIC_SYSTEM_SOCKET
+
