@@ -5,9 +5,9 @@ var-test
 server.old
 ._*
 monitrc
-config/nginx.conf
 .bundle/
 coverage
-/vendor/bundle
 /old
 /tmp
+/vendor
+/log
