@@ -41,6 +41,8 @@ http {
   <% if HTTP_PORT %>
   server {
     set $root <%= ROOT %>;
+    set $ssl off;
+
     <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
     <% end %>
@@ -55,6 +57,8 @@ http {
   <% if HTTPS_PORT %>
   server {
     set $root <%= ROOT %>;
+    set $ssl on;
+
     <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
     <% end %>

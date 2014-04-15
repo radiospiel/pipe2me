@@ -35,7 +35,15 @@ class Tunnel::Redirection
     # to keep the name intact, as any SSL certificate in use on the start
     # point must match the name of the request. As a result the target differs
     # from the request url only by the port number.
-    url = tunnel.urls(:https).first || tunnel.urls(:http).first
+
+    # An HTTPS request can only be redirected to a SSL tunnel; while a HTTP
+    # request can be redirected to either, but preferably to a non-encrypted.
+    if request.ssl?
+      url = tunnel.urls(:https).first
+    else
+      url = tunnel.urls(:http).first || tunnel.urls(:https).first
+    end
+
     return unless url
 
     url += path_info
