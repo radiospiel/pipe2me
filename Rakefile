@@ -38,7 +38,7 @@ namespace :run do
     ActiveRecord::Base.logger.level = Logger::INFO
     while true do
       sleep 1
-      UI.success "check"
+      # UI.success "check"
       MetricSystem.count "check", 1
       Tunnel.check do
         SSHD.write_authorized_keys
