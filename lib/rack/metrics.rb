@@ -22,7 +22,7 @@ module Rack
       StatHat.count("request", 1)
 
       MetricSystem.count("status.#{status_group}", 1)
-      MetricSystem.value("run_time", Time.now - start_time)
+      MetricSystem.gauge("run_time", Time.now - start_time)
       MetricSystem.count("request", 1)
 
       [status, headers, body]
