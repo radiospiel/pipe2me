@@ -102,7 +102,21 @@ welcome.
 
 Please use the git trimWhitespace tool from [https://github.com/radiospiel/git-trim-whitespace](https://github.com/radiospiel/git-trim-whitespace). It helps **tremendously** with whitespace issues.
 
-Please read the following note on licensing, though.
+Please read the note on licensing below, though.
+
+## Developer mode
+
+If you want to hack on the web backend, you can start developer mode, in which the entire backend
+is reloaded for each request. To start developer mode run these commands:
+
+    # reconfigure and start all processes
+    rake start
+
+    # stop the web process
+    monit -c monitrc stop web
+
+    # start a replacement web process
+    bundle exec shotgun -p 8888
 
 ### Licensing issues with your contributions
 

@@ -50,6 +50,8 @@ GEM
     rack_csrf (2.4.0)
       rack (>= 0.9)
     rake (10.2.2)
+    shotgun (0.9)
+      rack (>= 1.0)
     simple-ui (0.2.2)
     simplecov (0.8.2)
       docile (~> 1.1.0)
@@ -99,6 +101,7 @@ DEPENDENCIES
   rack
   rack_csrf
   rake
+  shotgun
   simple-ui
   simplecov
   sinatra

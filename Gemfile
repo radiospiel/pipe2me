@@ -23,6 +23,7 @@ end
 group :development do
   gem "etest-unit"
   gem "pipe2me-client"
+  gem "shotgun"
 end
 
 # -- use foreman to create startup files --------------------------------------

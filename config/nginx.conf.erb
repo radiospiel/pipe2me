@@ -34,8 +34,21 @@ http {
   tcp_nopush   on;
   # server_names_hash_bucket_size 128; # this seems to be required for some vhosts
 
+  # The backend can be delivered from an unix socket and a TCP socket. The nginx docs
+  # state that "..if an error occurs during communication with a server, the request will
+  # be passed to the next server, and so on until all of the functioning servers
+  # will be tried. If a successful response could not be obtained from any of the
+  # servers, the client will receive the result of the communication with the last server."
+  #
+  # Running the backend in a development mode then is just disabling the socket server,
+  # and starting a development server on port 8888 with shotgun:
+  #
+  #    monit -c monitrc stop web
+  #    shotgun -p 8888
+  #
   upstream backend {
     server unix:<%= VAR %>/web.sock;
+    server 127.0.0.1:8888;
   }
 
   <% if HTTP_PORT %>
@@ -62,10 +75,20 @@ http {
     <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
     <% end %>
-    listen               <%= HTTPS_PORT %>;
-    ssl                  on;
-    ssl_certificate      <%= VAR %>/openssl/certs/localhost.pem;
-    ssl_certificate_key  <%= VAR %>/openssl/private/localhost.pem;
+    listen                  <%= HTTPS_PORT %>;
+
+    # enable ssl
+    ssl                     on;
+    ssl_certificate         <%= VAR %>/openssl/certs/localhost.pem;
+    ssl_certificate_key     <%= VAR %>/openssl/private/localhost.pem;
+
+    # allow clients to verify via certificate
+    ssl_client_certificate  <%= VAR %>/openssl/root/certificate.pem;
+    ssl_verify_client       optional;
+
+    # set SSL headers
+    # include nginx/ssl.conf;
+
     # keepalive_timeout    70;
     #
     include nginx/pipe2me.conf;
