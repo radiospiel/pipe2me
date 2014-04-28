@@ -1,6 +1,0 @@
-# cert settings: these go into the CN (common name) of the certificate.
-CA_COUNTRY="DE"
-CA_STATE="Berlin"
-CA_CITY="Berlin"
-CA_ORGANIZATION="pipe2me"
-CA_ORG_UNIT=""

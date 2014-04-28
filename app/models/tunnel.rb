@@ -135,19 +135,24 @@ class Tunnel < ActiveRecord::Base
 
   # -- OpenSSL cerificate -----------------------------------------------------
 
+  MINICA="#{ROOT}/vendor/miniCA/bin/miniCA"
+
+  # sign a CSR and return the certificate
+  def sign_certificate_request!(csr)
+    Dir.mktmpdir("foo") do |dir|
+      Dir.chdir(dir) do
+        File.open("#{fqdn}.csr", "w") { |io| io.write csr }
+
+        Sys.sys! MINICA, "sign", "-r", "#{VAR}/miniCA", "#{fqdn}.csr"
+
+        return File.read("#{fqdn}.pem")
+      end
+    end
+  end
+
   def openssl_sign_certificate!(csr)
-    tmpfile = Tempfile.new("#{fqdn}.csr")
-    tmpfile.write csr
-    tmpfile.close
-
-    Sys.sys! "#{ROOT}/ca/sign-certificate", fqdn, tmpfile.path
-    openssl_certificate = File.read "#{VAR}/openssl/certs/#{fqdn}.pem"
-    update_attributes! :openssl_certificate => openssl_certificate
-
-    tmpfile.unlink                            # deletes the temp file
-  rescue
-    tmpfile.close! rescue nil                 # close and deletes the temp file
-    raise
+    signed_certificate = sign_certificate_request!(csr)
+    update_attributes! :openssl_certificate => signed_certificate
   end
 
   # -- SSH keys ---------------------------------------------------------------

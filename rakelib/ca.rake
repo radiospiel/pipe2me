@@ -1,13 +1,14 @@
 namespace :ca do
-  desc "Create etc/nginx.conf"
-  task :init => :localhost do
-    system "#{ROOT}/ca/init"
+  desc "Initialise CA and generate certificate for this server instance"
+  task :init => "var/openssl/private/localhost.pem"
 
-    puts "Initialized ca"
-  end
-
-  task :localhost => "var/openssl/private/localhost.pem"
   file "var/openssl/private/localhost.pem" do
-    system "#{ROOT}/ca/mk-certificate localhost"
+    miniCA="#{ROOT}/vendor/miniCA/bin/miniCA"
+
+    system "#{miniCA} init -r #{VAR}/miniCA"
+    Dir.chdir "var/openssl/private" do
+      system "#{miniCA} generate localhost"
+      system "#{miniCA} sign -r #{ROOT}/var/miniCA localhost.csr"
+    end
   end
 end

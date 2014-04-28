@@ -11,6 +11,7 @@ end
 
 require_relative "config/environment"
 
+task :configure => "configure:3rdparty"
 task :configure => "configure:dependencies"
 task :configure => "configure:directories"
 task :configure => "configure:files"

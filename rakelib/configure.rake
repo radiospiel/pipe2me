@@ -1,4 +1,8 @@
 namespace :configure do
+  task :"3rdparty" do
+    system "make -C vendor -f ../Sourcefile"
+  end
+
   # desc "Install dependencies"
   task :dependencies do
     binaries = %w(daemon monit sshd nginx)

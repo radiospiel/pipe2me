@@ -31,16 +31,6 @@ module Tunnel::Status
 end
 
 module Tunnel::Status::Etest
-  def test_check_wo_block
-    Tunnel.update_all status: ""
-
-    # the first check should yield
-    assert Tunnel.check
-
-    # the next check should not yield
-    assert !Tunnel.check
-  end
-
   def test_check
     Tunnel.update_all status: ""
 

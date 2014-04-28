@@ -1,0 +1,11 @@
+# Installation for 3rd party software. Install via make -f Sourcefile package-name
+
+ALL=miniCA
+
+all: $(ALL)
+
+miniCA: miniCA/bin/miniCA
+
+miniCA/bin/miniCA:
+	curl -L https://github.com/kinkome/miniCA/archive/v0.1.1.tar.gz | tar xv
+	ln -sf miniCA-0.1.1 miniCA
