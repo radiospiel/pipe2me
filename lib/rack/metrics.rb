@@ -17,15 +17,27 @@ module Rack
 
       status_group = (status / 100) * 100
 
-      StatHat.count("status.#{status_group}", 1)
-      StatHat.value("run_time", Time.now - start_time)
-      StatHat.count("request", 1)
+      unexcepted do
+        StatHat.count("status.#{status_group}", 1)
+        StatHat.value("run_time", Time.now - start_time)
+        StatHat.count("request", 1)
+      end
 
-      MetricSystem.count("status.#{status_group}", 1)
-      MetricSystem.gauge("run_time", Time.now - start_time)
-      MetricSystem.count("request", 1)
+      unexcepted do
+        MetricSystem.count("status.#{status_group}", 1)
+        MetricSystem.gauge("run_time", Time.now - start_time)
+        MetricSystem.count("request", 1)
+      end
 
       [status, headers, body]
+    end
+
+    private
+
+    def unexcepted(&block)
+      yield
+    rescue
+      STDERR.puts "[#{$!.class}] Ignoring exception from\n\t" + $!.backtrace.join("\n\t")
     end
   end
 end
