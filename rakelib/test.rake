@@ -28,12 +28,13 @@ namespace :test do
     system "monit start all"
     system "sleep 3"
 
+    here = File.dirname(__FILE__)
     file = `gem which pipe2me/version.rb`.chomp
     dir = File.expand_path "#{File.dirname(file)}/../.."
     Dir.chdir dir do
       puts "Working in #{Dir.getwd}"
       FileUtils.mkdir_p "tmp"
-      system "TEST_ENV=debug roundup test/*-test.sh"
+      system "TEST_ENV=debug #{here}/../script/roundup test/*-test.sh"
     end
   end
 end
