@@ -37,7 +37,7 @@ GEM
       sqlite3
     minitest (4.7.5)
     multi_json (1.8.4)
-    pipe2me-client (0.2.14)
+    pipe2me-client (0.2.15)
       foreman
       rack
       simple-ui
