@@ -1,12 +1,9 @@
 class Controllers::Inspect < Controllers::Base
 
   helpers do
-    def format_hash(hash, upcase_only = false)
-      hash.to_a.
-        sort_by(&:first).map do |key, value|
-          next if upcase_only && key =~ /[a-z]/
-          "%25s: %s\n" % [ key.to_s, value.inspect ]
-        end.compact.
+    def format_hash(hsh)
+      hsh.sort_by(&:first).
+        map { |key, value| "%25s: %s\n" % [ key.to_s, value.inspect ] }.
         join
     end
   end
@@ -24,7 +21,7 @@ class Controllers::Inspect < Controllers::Base
       "\n# Headers\n\n",
       format_hash(headers),
       "\n# Request env\n\n",
-      format_hash(request.env, upcase_only: true)
+      format_hash(request.env.select { |key,v| key !~ /[a-z]/ })
     ]
   end
 end

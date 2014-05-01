@@ -68,6 +68,7 @@ require "rack/csrf"
 require "controllers"
 require "controllers/info"
 require "controllers/inspect"
+require "controllers/inspect_sh"
 require "controllers/tunnels"
 
 # -- run app ------------------------------------------------------------------
@@ -75,5 +76,6 @@ require "controllers/tunnels"
 run Rack::URLMap.new(
   "/"               => Controllers::Info.new,
   "/inspect"        => Controllers::Inspect.new,
+  "/inspect.sh"     => Controllers::InspectSh.new,
   "/tunnels"        => Controllers::Tunnels.new
 )
