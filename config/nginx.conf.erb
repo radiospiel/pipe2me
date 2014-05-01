@@ -81,7 +81,7 @@ http {
     ssl_certificate_key     <%= VAR %>/openssl/private/localhost.priv;
 
     # allow clients to verify via certificate
-    ssl_client_certificate  <%= VAR %>/openssl/root/certificate.pem;
+    ssl_client_certificate  <%= VAR %>/miniCA/root.pem;
     ssl_verify_client       optional;
 
     # set SSL headers

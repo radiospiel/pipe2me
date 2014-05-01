@@ -9,8 +9,14 @@ namespace :ca do
     FileUtils.mkdir_p "var/openssl/private"
 
     Dir.chdir "var/openssl/private" do
-      system "#{miniCA} generate localhost"
-      system "#{miniCA} sign -r #{ROOT}/var/miniCA localhost.csr"
+      Sys.sys! miniCA, :generate, TUNNEL_DOMAIN
+
+      if TUNNEL_DOMAIN != "localhost"
+        FileUtils.mv "#{TUNNEL_DOMAIN}.csr", "localhost.csr"
+        FileUtils.mv "#{TUNNEL_DOMAIN}.priv", "localhost.priv"
+      end
+
+      Sys.sys! miniCA, :sign, "-r", "#{ROOT}/var/miniCA", "localhost.csr"
     end
   end
 end
