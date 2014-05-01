@@ -58,6 +58,7 @@ http {
     <% end %>
 
     listen <%= HTTP_PORT %>;
+    set $forwarded_port <%= HTTP_PORT %>;
     include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>
     include nginx/monit.conf;
@@ -73,7 +74,6 @@ http {
     <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
     <% end %>
-    listen                  <%= HTTPS_PORT %>;
 
     # enable ssl
     ssl                     on;
@@ -89,6 +89,10 @@ http {
 
     # keepalive_timeout    70;
     #
+
+    listen                  <%= HTTPS_PORT %>;
+    set $forwarded_port <%= HTTPS_PORT %>;
+
     include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>
     include nginx/monit.conf;
