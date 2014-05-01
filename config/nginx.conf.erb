@@ -79,8 +79,8 @@ http {
 
     # enable ssl
     ssl                     on;
-    ssl_certificate         <%= VAR %>/openssl/certs/localhost.pem;
-    ssl_certificate_key     <%= VAR %>/openssl/private/localhost.pem;
+    ssl_certificate         <%= VAR %>/openssl/private/localhost.pem;
+    ssl_certificate_key     <%= VAR %>/openssl/private/localhost.priv;
 
     # allow clients to verify via certificate
     ssl_client_certificate  <%= VAR %>/openssl/root/certificate.pem;
