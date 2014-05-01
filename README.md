@@ -100,14 +100,16 @@ For more details see the file COPYING.APL, for a more thorough discussion compar
 pipe2me and pipe2me-client are open sourced. Your contributions and pull requests are
 welcome.
 
-Please use the git trimWhitespace tool from [https://github.com/radiospiel/git-trim-whitespace](https://github.com/radiospiel/git-trim-whitespace). It helps **tremendously** with whitespace issues.
+Please use the git trimWhitespace tool from [https://github.com/radiospiel/git-trim-whitespace](https://github.com/radiospiel/git-trim-whitespace).
+It helps **tremendously** with whitespace issues.
 
 Please read the note on licensing below, though.
 
 ## Developer mode
 
-If you want to hack on the web backend, you can start developer mode, in which the entire backend
-is reloaded for each request. To start developer mode run these commands:
+If you want to hack on the web backend, you can start developer mode, in which the entire
+backend is reloaded for each request. Developer mode loads the entire pipe2me server, and
+runs an additional backend process, which completely reloads for each incoming HTTP(S) request.
 
     # reconfigure and start all processes
     rake start
@@ -115,7 +117,7 @@ is reloaded for each request. To start developer mode run these commands:
     # stop the web process
     monit -c monitrc stop web
 
-    # start a replacement web process
+    # start a web process for developer mode. This is expected to run on port 8888
     bundle exec shotgun -p 8888
 
 ### Licensing issues with your contributions
@@ -128,6 +130,7 @@ complicated, but really is not: you could (and probably should) license your
 contributions under the terms of the MIT License.
 
 If you feel unsure about this feel free to discuss this issue with us.
+
 ## Supporting this project
 
 > If you are hosting a domain, want to support this project, and decide to have a look

@@ -34,21 +34,18 @@ http {
   tcp_nopush   on;
   # server_names_hash_bucket_size 128; # this seems to be required for some vhosts
 
-  # The backend can be delivered from an unix socket and a TCP socket. The nginx docs
-  # state that "..if an error occurs during communication with a server, the request will
-  # be passed to the next server, and so on until all of the functioning servers
-  # will be tried. If a successful response could not be obtained from any of the
-  # servers, the client will receive the result of the communication with the last server."
-  #
-  # Running the backend in a development mode then is just disabling the socket server,
-  # and starting a development server on port 8888 with shotgun:
-  #
-  #    monit -c monitrc stop web
-  #    shotgun -p 8888
-  #
+  # The backend can be delivered from an unix socket and a TCP socket.
   upstream backend {
-    server unix:<%= VAR %>/web.sock;
+    #
+    # This is a server for the web backend development mode, which can be
+    # started, for example, via "script/development"
     server 127.0.0.1:8888;
+
+    #
+    # It may seem strange to call this the "backup" server, when, in fact, it
+    # is the production server. The idea is that the development server takes
+    # precendence when running.
+    server unix:<%= VAR %>/web.sock backup;
   }
 
   <% if HTTP_PORT %>
@@ -59,6 +56,7 @@ http {
     <% if MONIT_PORT %>
     set $monit_port <%= MONIT_PORT %>;
     <% end %>
+
     listen <%= HTTP_PORT %>;
     include nginx/pipe2me.conf;
     <% if MONIT_PUBLIC_ACCESS %>

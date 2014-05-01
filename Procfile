@@ -1,6 +1,6 @@
 # -- web: the web service ---------------------------------------------
 
-web:            bundle exec thin start --socket `pwd`/var/web.sock
+web:            bundle exec thin start --socket `pwd`/var/web.sock -e production
 nginx:          $(which nginx) -c `pwd`/var/config/nginx.conf
 checker:        bundle exec rake run:check
 
