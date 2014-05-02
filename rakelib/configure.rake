@@ -1,5 +1,6 @@
 namespace :configure do
   task :"3rdparty" do
+    FileUtils.mkdir_p "vendor"
     system "make -C vendor -f ../Sourcefile"
   end
 
