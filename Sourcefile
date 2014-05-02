@@ -6,6 +6,9 @@ all: $(ALL)
 
 miniCA: miniCA/bin/miniCA
 
-miniCA/bin/miniCA:
-	curl -L https://github.com/kinkome/miniCA/archive/v0.1.1.tar.gz | tar xv
-	ln -sf miniCA-0.1.1 miniCA
+miniCA/bin/miniCA: miniCA-0.1.2
+
+miniCA-0.1.2:
+	rm -f miniCA
+	curl -L https://github.com/kinkome/miniCA/archive/v0.1.2.tar.gz | tar xvz
+	ln -sf $@ miniCA
